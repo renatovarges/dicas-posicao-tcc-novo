@@ -1,0 +1,56 @@
+# Arquivos do sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Arquivos de backup
+*.bak
+*.backup
+*~
+
+# Arquivos de configuração local
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node modules (caso seja adicionado no futuro)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de build (caso seja adicionado no futuro)
+dist/
+build/
+
+# Arquivos de ambiente local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos de teste temporários
+test_*.html
+validate_*.html
+
+# Arquivos compactados
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Arquivos de documentação temporários
+*.docx
+*.pdf
+*.pptx

@@ -1,0 +1,47 @@
+# Configuração do Netlify para o site de Dicas por Posição TCC
+
+[build]
+  # Diretório de publicação (pasta raiz do projeto)
+  publish = "."
+  
+  # Comando de build (não necessário para site estático)
+  command = "echo 'Site estático pronto para deploy'"
+
+# Configurações de redirecionamento e headers
+[[headers]]
+  # Aplicar headers para todos os arquivos
+  for = "/*"
+  [headers.values]
+    # Permitir CORS para API do Cartola
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+    
+    # Cache para arquivos estáticos
+    Cache-Control = "public, max-age=3600"
+
+# Headers específicos para arquivos de imagem
+[[headers]]
+  for = "/public/escudos/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/public/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Configuração para SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"], Country = ["US"]}
+  force = false
+
+# Configurações de ambiente
+[context.production.environment]
+  NODE_ENV = "production"
+  
+[context.deploy-preview.environment]
+  NODE_ENV = "development"

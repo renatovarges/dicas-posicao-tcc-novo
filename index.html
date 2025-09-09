@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+    <title>Dicas por Posição - TCC</title>
+    <link rel="stylesheet" href="styles.css?v=5.0">
+</head>
+<body>
+    <div class="container">
+        <!-- Área de controles -->
+        <div class="controls">
+            <h1>Gerador de Dicas por Posição - TCC</h1>
+            <div class="controls-section">
+                <label for="roundNumber">Número da Rodada:</label>
+                <input type="number" id="roundNumber" placeholder="Ex: 1, 2, 3..." min="1" max="38">
+                
+                <label for="fileInput">Carregar Lista de Jogadores:</label>
+                <input type="file" id="fileInput" accept=".csv,.txt">
+                <button id="updateMarketBtn">Atualizar Mercado</button>
+                <button id="generateBtn">Gerar Arte</button>
+                
+                <div class="export-options">
+                    <label for="exportSize">Tamanho da Exportação:</label>
+                    <select id="exportSize">
+                        <option value="1350x2250">1350×2250 px (Stories)</option>
+                        <option value="2700x4500" selected>2700×4500 px (Alta Definição)</option>
+                        <option value="4050x6750">4050×6750 px (Ultra HD)</option>
+                    </select>
+                </div>
+                
+                <div class="export-buttons" style="display: none;">
+                    <button id="downloadPngBtn">Baixar PNG</button>
+                    <button id="downloadPdfBtn">Baixar PDF</button>
+                    <button id="downloadPdfVectorBtn">Baixar PDF Vetorial</button>
+                </div>
+                
+                <div id="errorMessages" class="error-messages"></div>
+            </div>
+        </div>
+
+        <!-- Canvas para geração da imagem -->
+        <div class="canvas-container">
+            <canvas id="artCanvas" width="2700" height="5400"></canvas>
+        </div>
+
+        <!-- Layout da arte (2700x4500px) -->
+        <div class="art-layout" id="artLayout">
+            <!-- Header com logo -->
+            <div class="header">
+                <img src="TCCBRANCOTRANSPARENTE.png" alt="TCC Logo" class="logo">
+                <h1 class="title" id="artTitle">DICAS POR POSIÇÃO - TCC</h1>
+            </div>
+
+            <!-- Grid com 6 blocos de posições -->
+            <div class="positions-grid">
+                <!-- Técnicos -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>TÉCNICOS</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="tecnicos">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Goleiros -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>GOLEIROS</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="goleiros">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Laterais -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>LATERAIS</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="laterais">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Zagueiros -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>ZAGUEIROS</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="zagueiros">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Meias -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>MEIAS</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="meias">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Atacantes -->
+                <div class="position-block">
+                    <div class="position-header">
+                        <h2>ATACANTES</h2>
+                        <div class="header-labels">
+                            <span>C</span>
+                            <span>C$</span>
+                        </div>
+                    </div>
+                    <div class="players-list" id="atacantes">
+                        <!-- Jogadores serão inseridos aqui via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="legend">
+                    <div class="legend-item">
+                        <img src="public/icons/luxo.svg" alt="RL" class="icon">
+                        <span>RL - luxo</span>
+                    </div>
+                    <div class="legend-item">
+                        <img src="public/icons/estrela.svg" alt="Unanimidade" class="icon">
+                        <span>Unanimidade</span>
+                    </div>
+                    <div class="legend-item">
+                        <img src="public/icons/confA.svg" alt="Nível A" class="icon">
+                        <span>Nível de confiança</span>
+                    </div>
+                    <div class="legend-item">
+                        <img src="public/icons/capitao.svg" alt="Capitão" class="icon">
+                        <span>Bom capitão</span>
+                    </div>
+                </div>
+                <p class="footer-text">CONTEÚDO EXCLUSIVO - TREINANDO CAMPEÕES DE CARTOLA</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js?v=2.1"></script>
+</body>
+</html>

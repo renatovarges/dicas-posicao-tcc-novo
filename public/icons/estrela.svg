@@ -1,0 +1,12 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Estrela principal -->
+  <path d="M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z" fill="#FFD700" stroke="#FFA500" stroke-width="0.5"/>
+  <!-- Estrela interna menor para brilho -->
+  <path d="M12 4.5L14.18 9.32L19.5 9.82L15.75 13.18L16.64 18.45L12 15.89L7.36 18.45L8.25 13.18L4.5 9.82L9.82 9.32L12 4.5Z" fill="#FFF8DC" opacity="0.8"/>
+  <!-- Centro brilhante -->
+  <circle cx="12" cy="12" r="2" fill="#FFFFFF" opacity="0.9"/>
+  <!-- Pequenos pontos de luz -->
+  <circle cx="12" cy="6" r="0.5" fill="#FFFFFF" opacity="0.8"/>
+  <circle cx="16" cy="10" r="0.3" fill="#FFFFFF" opacity="0.6"/>
+  <circle cx="8" cy="14" r="0.3" fill="#FFFFFF" opacity="0.6"/>
+</svg>
