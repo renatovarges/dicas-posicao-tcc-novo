@@ -46,7 +46,7 @@ let cartolaData = null;
 let playerData = [];
 
 // Elementos DOM
-let artLayout, canvas, ctx;
+let artLayout, canvas, ctx, generateBtn;
 
 // Inicializar elementos DOM após carregamento
 function initializeDOM() {
@@ -60,7 +60,7 @@ function initializeDOM() {
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
-    const generateBtn = document.getElementById('generateBtn');
+    generateBtn = document.getElementById('generateBtn');
     const updateMarketBtn = document.getElementById('updateMarketBtn');
     const downloadPngBtn = document.getElementById('downloadPngBtn');
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
@@ -118,9 +118,9 @@ function updateArtTitle() {
     const artTitle = document.getElementById('artTitle');
     
     if (roundNumber && roundNumber.trim() !== '') {
-        artTitle.textContent = `DICAS POR POSIÇÃO - MD3 - RODADA ${roundNumber}`;
+        artTitle.textContent = `DICAS POR POSIÇÃO - TCC - RODADA ${roundNumber}`;
     } else {
-        artTitle.textContent = 'DICAS POR POSIÇÃO - MD3';
+        artTitle.textContent = 'DICAS POR POSIÇÃO - TCC';
     }
 }
 
@@ -256,7 +256,7 @@ function parsePlayerData(content) {
                 capitao: false,
                 unanimidade: false,
                 luxo: false,
-                fora20: false,
+    
                 preco: null
             };
             
@@ -280,11 +280,7 @@ function parsePlayerData(content) {
                     player.luxo = true;
                 }
                 
-                // Detectar fora dos 20+
-                if (indicator === 'fora 20' || indicator === 'fora dos 20' || indicator === 'fora20' || 
-                    indicator === 'fora' || indicator.includes('fora') && indicator.includes('20')) {
-                    player.fora20 = true;
-                }
+
             }
             
             // Log específico para técnicos e Lyanco
@@ -599,14 +595,14 @@ function applyDynamicLayout(playersByPosition) {
     
     // Calcular proporções baseadas na quantidade de jogadores
     // Pesos ajustados para dar mais espaço aos meias e atacantes
-    const baseWeight1 = 0.25; // Técnicos/Goleiros - peso menor
-    const baseWeight2 = 0.3;  // Laterais/Zagueiros - peso médio
-    const baseWeight3 = 0.4;  // Meias/Atacantes - peso maior para evitar corte
-    const playerWeight = 0.08; // Peso adicional aumentado por jogador
+    const baseWeight1 = 0.2; // Técnicos/Goleiros - peso menor
+    const baseWeight2 = 0.25;  // Laterais/Zagueiros - peso médio
+    const baseWeight3 = 0.55;  // Meias/Atacantes - peso maior para evitar corte
+    const playerWeight = 0.1; // Peso adicional aumentado por jogador
     
     const row1Weight = Math.max(baseWeight1, baseWeight1 + (row1Count * playerWeight));
     const row2Weight = Math.max(baseWeight2, baseWeight2 + (row2Count * playerWeight));
-    const row3Weight = Math.max(baseWeight3, baseWeight3 + (row3Count * playerWeight * 1.2)); // Peso extra para linha 3
+    const row3Weight = Math.max(baseWeight3, baseWeight3 + (row3Count * playerWeight * 1.5)); // Peso extra para linha 3
     
     // Normalizar os pesos para que a soma seja proporcional
     const totalWeight = row1Weight + row2Weight + row3Weight;
@@ -709,16 +705,7 @@ function createPlayerElement(player) {
         console.log('Ícone de capitão adicionado');
     }
     
-    if (player.fora20) {
-        const fora20Icon = document.createElement('img');
-        fora20Icon.src = 'public/icons/fora20.svg';
-        fora20Icon.className = 'icon';
-        fora20Icon.alt = 'Fora dos 20+ escalados';
-        fora20Icon.onerror = function() { console.error('Erro ao carregar ícone fora20'); };
-        fora20Icon.onload = function() { console.log('Ícone fora20 carregado com sucesso'); };
-        playerIcons.appendChild(fora20Icon);
-        console.log('Ícone fora20 adicionado');
-    }
+
     
     console.log(`Total de ícones no container: ${playerIcons.children.length}`);
     console.log(`PlayerIcons HTML:`, playerIcons.outerHTML);
@@ -785,14 +772,10 @@ function downloadImage(format = 'png') {
     const originalTransform = artLayout.style.transform;
     const originalTransformOrigin = artLayout.style.transformOrigin;
     
-    // Calcular escala baseada na resolução desejada
-    const scaleX = width / 2900;
-    const scaleY = height / 4800;
-    const scale = Math.min(scaleX, scaleY); // Usar a menor escala para manter proporção
-    
+    // Calcular altura real do conteúdo
     artLayout.style.width = width + 'px';
-    artLayout.style.height = height + 'px';
-    artLayout.style.transform = 'scale(1)'; // Garantir escala 1:1 para captura
+    artLayout.style.height = 'auto'; // Permitir altura automática
+    artLayout.style.transform = 'scale(1)';
     artLayout.style.transformOrigin = 'top left';
     artLayout.style.position = 'relative';
     artLayout.style.left = '0';
@@ -801,6 +784,19 @@ function downloadImage(format = 'png') {
     // Ajustar tamanhos internos proporcionalmente
     const scaleFactor = width / 2900;
     document.documentElement.style.setProperty('--export-scale', scaleFactor);
+    
+    // Forçar recálculo do layout
+    artLayout.offsetHeight;
+    
+    // Calcular altura precisa do conteúdo visível
+    const contentHeight = artLayout.scrollHeight;
+    const minHeight = Math.min(height, contentHeight);
+    
+    // Adicionar margem mínima de segurança (2% da altura original)
+    const safetyMargin = Math.floor(height * 0.02);
+    const optimizedHeight = Math.min(contentHeight + safetyMargin, height);
+    
+    artLayout.style.height = optimizedHeight + 'px';
     
     // Adicionar classe específica para a resolução
     artLayout.classList.remove('export-1450', 'export-2900', 'export-4350');
@@ -815,7 +811,7 @@ function downloadImage(format = 'png') {
     // Gerar imagem com html2canvas com configurações de alta qualidade
     html2canvas(artLayout, {
         width: width,
-        height: height,
+        height: optimizedHeight,
         scale: Math.max(scaleFactor, 2), // Mínimo de 2x para melhor qualidade
         useCORS: true,
         allowTaint: true,
@@ -829,7 +825,7 @@ function downloadImage(format = 'png') {
         x: 0,
         y: 0,
         windowWidth: width,
-        windowHeight: height
+        windowHeight: optimizedHeight
     }).then(canvas => {
         // Restaurar tamanho original
         artLayout.style.width = originalWidth;
