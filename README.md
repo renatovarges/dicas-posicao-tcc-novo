@@ -1,4 +1,4 @@
-# 🏆 Dicas por Posição - TCC Cartola FC
+﻿# 🏆 Dicas por Posição - TCC Cartola FC
 
 ## 📖 Sobre o Projeto
 
