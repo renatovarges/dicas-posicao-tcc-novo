@@ -70,7 +70,7 @@ body {
     top: 20px;
     right: 20px;
     background: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00a651;
+    border: 2px solid #006b35;
     padding: 20px;
     border-radius: 12px;
     color: white;
@@ -94,7 +94,7 @@ body {
 .export-options select {
     padding: 8px;
     border-radius: 6px;
-    border: 1px solid #00a651;
+    border: 1px solid #006b35;
     background: #000000;
     color: white;
 }
@@ -125,7 +125,7 @@ body {
 }
 
 .controls h1 {
-    color: #00a651;
+    color: #006b35;
     margin-bottom: 20px;
 }
 
@@ -149,7 +149,7 @@ body {
 
 .controls input[type="number"] {
     padding: 10px;
-    border: 2px solid #00a651;
+    border: 2px solid #006b35;
     border-radius: 5px;
     background: #000000;
     color: white;
@@ -160,13 +160,13 @@ body {
 
 .controls input[type="number"]:focus {
     outline: none;
-    border-color: #008542;
+    border-color: #006b35;
     box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
 }
 
 .upload-section button {
     padding: 12px 24px;
-    background: #00a651;
+    background: #006b35;
     color: white;
     border: none;
     border-radius: 5px;
@@ -176,7 +176,7 @@ body {
 }
 
 .upload-section button:hover {
-    background: #008542;
+    background: #006b35;
 }
 
 .upload-section button:disabled {
@@ -193,7 +193,7 @@ body {
 .art-layout {
     width: 2900px;
     height: 4800px;
-    background: linear-gradient(135deg, #000000 0%, #008542 50%, #00a651 100%);
+    background: linear-gradient(135deg, #000000 0%, #006b35 50%, #006b35 100%);
     position: relative;
     /* Melhorar qualidade de renderização */
     -webkit-font-smoothing: antialiased;
@@ -205,7 +205,7 @@ body {
     transform: translateZ(0);
     margin: 0 auto;
     border-radius: 20px;
-    border: 8px solid #00a651;
+    border: 8px solid #006b35;
     overflow: visible;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     transform-origin: top left;
@@ -302,7 +302,7 @@ body {
 /* Bloco de posição */
 .position-block {
     background: rgba(0,0,0,0.9);
-    border: 3px solid #00a651;
+    border: 3px solid #006b35;
     border-radius: 20px;
     padding: 35px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 30px rgba(212,175,55,0.2);
@@ -357,9 +357,9 @@ body {
     align-items: center;
     margin-bottom: 25px;
     padding: 30px 35px;
-    background: linear-gradient(135deg, #00a651 0%, #008542 100%);
+    background: linear-gradient(135deg, #006b35 0%, #006b35 100%);
     border-radius: 15px;
-    border: 3px solid #00c766;
+    border: 3px solid #00a651;
     box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4), inset 0 2px 4px rgba(255,255,255,0.1);
     position: relative;
     overflow: hidden;
@@ -374,7 +374,7 @@ body {
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, transparent 0%, #00c766 50%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, #00a651 50%, transparent 100%);
 }
 
 .position-header h2 {
@@ -438,8 +438,8 @@ body {
     padding: 20px 30px;
     background: rgba(0,0,0,0.6);
     border-radius: 12px;
-    border-left: 5px solid #00a651;
-    border: 1px solid #008542;
+    border-left: 5px solid #006b35;
+    border: 1px solid #006b35;
     transition: all 0.3s ease;
     overflow: visible;
     box-sizing: border-box;
@@ -449,7 +449,7 @@ body {
 
 /* .player-row:hover {
     background: rgba(255,255,255,0.05);
-    border-color: #00c766;
+    border-color: #00a651;
     transform: translateX(3px);
 } */
 
@@ -607,7 +607,7 @@ body {
     bottom: 0;
     left: 30px;
     right: 30px;
-    background: #00a651;
+    background: #006b35;
     color: white;
     padding: 0;
     text-align: center;
@@ -724,7 +724,7 @@ img[src$=".svg"] {
     height: 50px;
     margin: -25px 0 0 -25px;
     border: 5px solid #f3f3f3;
-    border-top: 5px solid #00a651;
+    border-top: 5px solid #006b35;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -743,7 +743,7 @@ img[src$=".svg"] {
     margin: 4px 0;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    border-left: 4px solid #00a651;
+    border-left: 4px solid #006b35;
     font-size: 14px;
     transition: all 0.3s ease;
 }
@@ -1352,7 +1352,7 @@ img[src$=".svg"] {
 .art-layout[style*="width: 4350px"] {
     overflow: visible !important;
     height: auto !important;
-    border: 8px solid #00a651 !important;
+    border: 8px solid #006b35 !important;
     box-sizing: border-box !important;
 }
 
@@ -1360,7 +1360,7 @@ img[src$=".svg"] {
 .art-layout.export-1450,
 .art-layout.export-2900,
 .art-layout.export-4350 {
-    border: 8px solid #00a651 !important;
+    border: 8px solid #006b35 !important;
     box-sizing: border-box !important;
 }
 /* ===== FIM DA CORRE��O ESPEC�FICA ===== */
