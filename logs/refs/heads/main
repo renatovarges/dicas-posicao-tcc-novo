@@ -1,0 +1,3 @@
+0000000000000000000000000000000000000000 c3c70873fcc3234230cca3d6c88e360d6c7526ff renatovarges <renatovarges@id.uff.br> 1757426277 -0300	commit (initial): Initial commit
+c3c70873fcc3234230cca3d6c88e360d6c7526ff b56fa7c7e5f6e76385359fc728688332622d8368 renatovarges <renatovarges@id.uff.br> 1757426861 -0300	commit: Primeira versão da ferramenta de dicas TCC
+b56fa7c7e5f6e76385359fc728688332622d8368 105569b888a1e260515e3344acdabf30d8ab4500 renatovarges <renatovarges@id.uff.br> 1757428263 -0300	commit: Resolver CORS com função serverless

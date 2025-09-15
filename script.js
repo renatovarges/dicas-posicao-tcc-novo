@@ -2,8 +2,8 @@
 const CARTOLA_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'https://api.cartola.globo.com/atletas/mercado'
     : '/.netlify/functions/cartola-api';
-const CANVAS_WIDTH = 2700;
-const CANVAS_HEIGHT = 5400;
+const CANVAS_WIDTH = 2900;
+const CANVAS_HEIGHT = 4800;
 
 // Mapeamento de posições
 const POSITION_MAP = {
@@ -615,8 +615,8 @@ function downloadImage(format = 'png') {
     const originalTransformOrigin = artLayout.style.transformOrigin;
     
     // Calcular escala baseada na resolução desejada
-    const scaleX = width / 2700;
-        const scaleY = height / 4500;
+    const scaleX = width / 2900;
+    const scaleY = height / 4800;
     const scale = Math.min(scaleX, scaleY); // Usar a menor escala para manter proporção
     
     artLayout.style.width = width + 'px';
@@ -628,18 +628,18 @@ function downloadImage(format = 'png') {
     artLayout.style.top = '0';
     
     // Ajustar tamanhos internos proporcionalmente
-    const scaleFactor = width / 2700;
+    const scaleFactor = width / 2900;
     document.documentElement.style.setProperty('--export-scale', scaleFactor);
     
     // Adicionar classe específica para a resolução
-    artLayout.classList.remove('export-1350', 'export-2700', 'export-4050');
-        if (width === 1350) {
-            artLayout.classList.add('export-1350');
-        } else if (width === 2700) {
-            artLayout.classList.add('export-2700');
-        } else if (width === 4050) {
-            artLayout.classList.add('export-4050');
-        }
+    artLayout.classList.remove('export-1450', 'export-2900', 'export-4350');
+    if (width === 1450) {
+        artLayout.classList.add('export-1450');
+    } else if (width === 2900) {
+        artLayout.classList.add('export-2900');
+    } else if (width === 4350) {
+        artLayout.classList.add('export-4350');
+    }
     
     // Gerar imagem com html2canvas com configurações de alta qualidade
     html2canvas(artLayout, {
@@ -666,7 +666,7 @@ function downloadImage(format = 'png') {
         artLayout.style.transform = originalTransform;
         artLayout.style.transformOrigin = originalTransformOrigin;
         document.documentElement.style.removeProperty('--export-scale');
-        artLayout.classList.remove('export-1350', 'export-2700', 'export-4050');
+        artLayout.classList.remove('export-1450', 'export-2900', 'export-4350');
         
         if (format === 'png') {
             downloadPNG(canvas, exportSize);

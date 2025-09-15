@@ -13,7 +13,7 @@
 /* Variáveis CSS para fontes escaláveis */
 :root {
     --font-size-title: clamp(2.5rem, 4.5vw, 7.5rem);
-    --font-size-position-header: clamp(3rem, 5.5vw, 10rem);
+    --font-size-position-header: clamp(2.5rem, 5vw, 8rem);
     --font-size-player: clamp(1.8rem, 3.5vw, 5rem);
     --font-size-price: clamp(1.5rem, 3.2vw, 4.5rem);
     --font-size-base: clamp(1rem, 1.8vw, 1.5rem);
@@ -189,10 +189,10 @@ body {
     display: none;
 }
 
-/* Layout da arte - Dimensões aumentadas 2700x5400px para mais espaço vertical */
+/* Layout da arte - Dimensões otimizadas 2900x4800px para melhor proporção */
 .art-layout {
-    width: 2700px;
-    height: 5400px;
+    width: 2900px;
+    height: 4800px;
     background: linear-gradient(135deg, #000000 0%, #1a4d1a 50%, #2d7d2d 100%);
     position: relative;
     /* Melhorar qualidade de renderização */
@@ -206,7 +206,7 @@ body {
     margin: 0 auto;
     border-radius: 20px;
     border: 8px solid #2d7d2d;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     transform-origin: top left;
 }
@@ -272,27 +272,31 @@ body {
 .positions-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 0.5fr 1.4fr 1.6fr;
-    gap: 30px;
-    padding: 30px;
-    height: calc(100% - 340px);
+    grid-template-rows: auto auto auto;
+    gap: 40px;
+    padding: 40px;
+    min-height: auto;
+    height: auto;
 }
 
 /* Posições com menos jogadores (técnicos e goleiros) */
 .positions-grid .position-block:nth-child(1),
 .positions-grid .position-block:nth-child(2) {
     grid-row: 1;
+    align-self: start;
 }
 
 /* Posições com mais jogadores (laterais, zagueiros, meias, atacantes) */
 .positions-grid .position-block:nth-child(3),
 .positions-grid .position-block:nth-child(4) {
     grid-row: 2;
+    align-self: start;
 }
 
 .positions-grid .position-block:nth-child(5),
 .positions-grid .position-block:nth-child(6) {
     grid-row: 3;
+    align-self: start;
 }
 
 /* Bloco de posição */
@@ -300,13 +304,14 @@ body {
     background: rgba(0,0,0,0.9);
     border: 3px solid #2d7d2d;
     border-radius: 20px;
-    padding: 30px;
+    padding: 35px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 30px rgba(45,125,45,0.2);
     display: flex;
     flex-direction: column;
     position: relative;
     transition: all 0.3s ease;
-    min-height: 0;
+    min-height: auto;
+    height: auto;
     overflow: visible;
 }
 
@@ -359,6 +364,7 @@ body {
     position: relative;
     overflow: hidden;
     min-height: 110px;
+    height: auto;
 }
 
 .position-header::before {
@@ -380,8 +386,10 @@ body {
     letter-spacing: 3px;
     position: relative;
     z-index: 1;
-    line-height: 1.1;
+    line-height: 1.2;
     margin: 0;
+    white-space: nowrap;
+    overflow: visible;
     /* Melhorar qualidade da renderização */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -418,7 +426,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    min-height: 0;
+    min-height: auto;
+    height: auto;
     overflow: visible;
 }
 
@@ -434,6 +443,8 @@ body {
     transition: all 0.3s ease;
     overflow: visible;
     box-sizing: border-box;
+    min-height: 90px;
+    width: 100%;
 }
 
 /* .player-row:hover {
@@ -889,103 +900,178 @@ img[src$=".svg"] {
 }
 
 /* Regras para exportação em diferentes resoluções */
-.art-layout.export-1350 {
-    /* Ajustes específicos para resolução 1350x2250 */
+.art-layout.export-1450 {
+    /* Ajustes específicos para resolução 1450x3000 */
     font-size: calc(1rem * var(--export-scale));
     overflow: visible;
     box-sizing: border-box;
 }
 
-.art-layout.export-2700 {
-    /* Ajustes específicos para resolução 2700x4500 */
+.art-layout.export-2900 {
+    /* Ajustes específicos para resolução 2900x6000 */
     font-size: calc(1rem * var(--export-scale));
     overflow: visible;
     box-sizing: border-box;
 }
 
-.art-layout.export-4050 {
-    /* Ajustes específicos para resolução 4050x6750 */
+.art-layout.export-4350 {
+    /* Ajustes específicos para resolução 4350x9000 */
     font-size: calc(1rem * var(--export-scale));
     /* Garantir que o layout não seja cortado */
     overflow: visible;
     box-sizing: border-box;
 }
 
-.art-layout[style*="width: 4050px"] {
+/* Estilos específicos para diferentes resoluções de exportação */
+.export-1450 .position-header {
+    min-height: 40px;
+    padding: 8px 12px;
+}
+
+.export-1450 .position-header h2 {
+    line-height: 1.2;
+}
+
+.export-1450 .player-row {
+    font-size: 6px;
+    padding: 2px 4px;
+}
+
+.export-1450 .position-block {
+    min-height: auto;
+    height: auto;
+}
+
+.export-2900 .position-header {
+    min-height: 80px;
+    padding: 16px 20px;
+}
+
+.export-2900 .position-header h2 {
+    line-height: 1.2;
+}
+
+.export-2900 .player-row {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+.export-2900 .position-block {
+    min-height: auto;
+    height: auto;
+}
+
+.export-4350 .position-header {
+    min-height: 120px;
+    padding: 24px 30px;
+}
+
+.export-4350 .position-header h2 {
+    line-height: 1.2;
+}
+
+.export-4350 .player-row {
+    font-size: 18px;
+    padding: 6px 12px;
+}
+
+.export-4350 .position-block {
+    min-height: auto;
+    height: auto;
+}
+
+/* Garantir que o grid se adapte durante a exportação */
+.export-1450 .positions-grid,
+.export-2900 .positions-grid,
+.export-4350 .positions-grid {
+    grid-template-rows: auto auto auto;
+    height: auto;
+    min-height: auto;
+}
+
+.export-1450 .players-list,
+.export-2900 .players-list,
+.export-4350 .players-list {
+    height: auto;
+    min-height: auto;
+    flex: 1;
+}
+
+.art-layout[style*="width: 4350px"] {
     /* Fallback para seletor de atributo */
     font-size: calc(1rem * var(--export-scale));
 }
 
-.art-layout.export-4050 .title,
-.art-layout[style*="width: 4050px"] .title {
+.art-layout.export-4350 .title,
+.art-layout[style*="width: 4350px"] .title {
     font-size: calc(var(--font-size-title) * var(--export-scale));
     letter-spacing: calc(3px * var(--export-scale));
 }
 
-.art-layout.export-4050 .position-title,
-.art-layout[style*="width: 4050px"] .position-title {
+.art-layout.export-4350 .position-title,
+.art-layout[style*="width: 4350px"] .position-title {
     font-size: calc(var(--font-size-position) * var(--export-scale));
 }
 
-.art-layout.export-4050 .position-header h2,
-.art-layout[style*="width: 4050px"] .position-header h2 {
+.art-layout.export-4350 .position-header h2,
+.art-layout[style*="width: 4350px"] .position-header h2 {
     font-size: calc(var(--font-size-position-header) * var(--export-scale));
     letter-spacing: calc(3px * var(--export-scale));
     text-shadow: calc(3px * var(--export-scale)) calc(3px * var(--export-scale)) calc(12px * var(--export-scale)) rgba(0,0,0,0.8), 0 0 calc(20px * var(--export-scale)) rgba(45,125,45,0.6);
 }
 
-.art-layout.export-4050 .player-name,
-.art-layout[style*="width: 4050px"] .player-name {
+.art-layout.export-4350 .player-name,
+.art-layout[style*="width: 4350px"] .player-name {
     font-size: calc(var(--font-size-player) * var(--export-scale));
 }
 
-.art-layout.export-4050 .player-price,
-.art-layout[style*="width: 4050px"] .player-price {
+.art-layout.export-4350 .player-price,
+.art-layout[style*="width: 4350px"] .player-price {
     font-size: calc(var(--font-size-price) * var(--export-scale));
 }
 
-.art-layout.export-4050 .team-badge,
-.art-layout[style*="width: 4050px"] .team-badge {
+.art-layout.export-4350 .team-badge,
+.art-layout[style*="width: 4350px"] .team-badge {
     width: 90px;
     height: 90px;
 }
 
-.art-layout.export-2700 .team-badge,
-.art-layout[style*="width: 2700px"] .team-badge {
+.art-layout.export-2900 .team-badge,
+.art-layout[style*="width: 2900px"] .team-badge {
     width: 80px;
     height: 80px;
 }
 
-.art-layout.export-1350 .team-badge,
-.art-layout[style*="width: 1350px"] .team-badge {
+.art-layout.export-1450 .team-badge,
+.art-layout[style*="width: 1450px"] .team-badge {
     width: 30px;
     height: 30px;
 }
 
-.art-layout.export-4050 .confidence-indicator,
-.art-layout[style*="width: 4050px"] .confidence-indicator {
+.art-layout.export-4350 .confidence-indicator,
+.art-layout[style*="width: 4350px"] .confidence-indicator {
     width: calc(40px * var(--export-scale));
     height: calc(40px * var(--export-scale));
 }
 
-.art-layout.export-4050 .logo,
-.art-layout[style*="width: 4050px"] .logo {
+.art-layout.export-4350 .logo,
+.art-layout[style*="width: 4350px"] .logo {
     width: calc(300px * var(--export-scale));
 }
 
-.art-layout.export-4050 .positions-grid,
-.art-layout[style*="width: 4050px"] .positions-grid {
+.art-layout.export-4350 .positions-grid,
+.art-layout[style*="width: 4350px"] .positions-grid {
     gap: calc(30px * var(--export-scale));
     padding: calc(30px * var(--export-scale));
 }
 
-.art-layout.export-4050 .header,
-.art-layout[style*="width: 4050px"] .header {
+.art-layout.export-4350 .header,
+.art-layout[style*="width: 4350px"] .header {
     padding: calc(30px * var(--export-scale)) calc(40px * var(--export-scale));
 }
 
-.art-layout.export-4050 .position-block,
-.art-layout[style*="width: 4050px"] .position-block {
+.art-layout.export-4350 .position-block,
+.art-layout[style*="width: 4350px"] .position-block {
     padding: calc(20px * var(--export-scale));
     border-radius: calc(15px * var(--export-scale));
     border-width: calc(3px * var(--export-scale));
@@ -993,8 +1079,8 @@ img[src$=".svg"] {
 
 
 
-.art-layout.export-4050 .player-row,
-.art-layout[style*="width: 4050px"] .player-row {
+.art-layout.export-4350 .player-row,
+.art-layout[style*="width: 4350px"] .player-row {
     padding: calc(12px * var(--export-scale)) calc(15px * var(--export-scale));
     margin-bottom: calc(8px * var(--export-scale));
     border-radius: calc(8px * var(--export-scale));
@@ -1231,3 +1317,50 @@ img[src$=".svg"] {
         font-size: 1.1rem;
     }
 }
+
+/* ==== CORRE��O PARA EXPORTA��O DO PNG ==== */
+.players-list {
+    /* Garante altura m�nima para n�o cortar o �ltimo nome */
+    min-height: 600px; /* ajuste se necess�rio */
+    overflow: visible !important; /* impede que corte o conte�do no PNG */
+}
+
+/* Fundo semi-transparente para reaparecer o logo ao fundo */
+.player-row {
+    background-color: rgba(0,0,0,0.6) !important; /* igual ao antigo */
+}
+
+/* Texto dos jogadores sempre vis�vel por cima do fundo */
+.player-row span {
+    position: relative;
+    z-index: 10;
+}
+
+/* ===== FIM DA CORRE��O ===== */
+
+/* ==== CORRE��O ESPEC�FICA PARA EXPORTA��O PNG ==== */
+/* Regras que s� afetam a exporta��o, n�o o layout normal do site */
+.art-layout.export-4350 .players-list,
+.art-layout[style*="width: 4350px"] .players-list {
+    min-height: 800px !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Garante que containers de exportação tenham altura suficiente */
+.art-layout.export-4350,
+.art-layout[style*="width: 4350px"] {
+    overflow: visible !important;
+    height: auto !important;
+    border: 8px solid #2d7d2d !important;
+    box-sizing: border-box !important;
+}
+
+/* Preservar bordas em todas as resoluções de exportação */
+.art-layout.export-1450,
+.art-layout.export-2900,
+.art-layout.export-4350 {
+    border: 8px solid #2d7d2d !important;
+    box-sizing: border-box !important;
+}
+/* ===== FIM DA CORRE��O ESPEC�FICA ===== */
