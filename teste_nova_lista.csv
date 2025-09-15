@@ -1,0 +1,32 @@
+Posição,Nome,Clube,Confiança,Capitão,Unanimidade,Reserva de Luxo,Fora dos 20+
+TEC,ROGER MACHADO,INTER,B,,,, 
+TEC,ABEL FERREIRA,PALMEIRAS,B,,UNI,, 
+TEC,Rafael Guanaes,Mirassol,A,,,,fora20 
+TEC,Fernando diniz,vasco,A,,,,fora20 
+TEC,LEO CONDE,CEARÁ,B,,,, 
+TEC,DANIEL PAULISTA,SPORT,C,,,, 
+GOL,BRAZÃO,SANTOS,A,,,, 
+GOL,LEO JARDIM,VASCO,A,,,,fora20 
+GOL,ROSSI,FLAMENGO,A,,,, 
+GOL,WALTER,MIRASSOL,A,,,,fora20 
+LAT,PIQUEREZ,PALMEIRAS,A,capitão,,, 
+LAT,PAULO HENRIQUE,VASCO,C,,,,fora20 
+LAT,WILLIAM,CRUZEIRO,A,capitão,unanimidade,, 
+LAT,VARELA,FLAMENGO,C,,,rl,fora20 
+LAT,REINALDO,MIRASSOL,A,,unanimidade,, 
+ZAG,LÉO ORTIZ,FLAMENGO,A,,,,fora20 
+ZAG,LÉO PEREIRA,FLAMENGO,A,,,rl, 
+ZAG,FERRARESI,SÃO PAULO,A,,unanimidade,, 
+ZAG,GUSTAVO GOMEZ,PALMEIRAS,A,,,,fora20 
+ZAG,LYANCO,ATLÉTICO MG,B,,,,fora20 
+MEI,ARRASCAETA,FLAMENGO,A,,unanimidade,, 
+MEI,VEIGA,PALMEIRAS,B,,,rl, 
+MEI,MATHEUS PEREIRA,CRUZEIRO,A,capitão,unanimidade,, 
+MEI,MAURICIO,PALMEIRAS,B,,,rl, 
+MEI,ALAN PATRICK,INTERNACIONAL,B,,,rl, 
+MEI,COUTINHO,VASCO,B,,,rl, 
+ATA,HULK,ATLÉTICO MG,A,capitão,,rl, 
+ATA,GERMAN CANO,FLUMINENSE,A,capitão,unanimidade,rl, 
+ATA,VEGETTI,VASCO,A,capitão,,rl, 
+ATA,KAIO JORGE,CRUZEIRO,A,capitão,unanimidade,,fora20 
+ATA,RAYAN,VASCO,B,,,rl,

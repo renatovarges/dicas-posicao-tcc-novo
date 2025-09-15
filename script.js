@@ -26,6 +26,8 @@ const CLUB_MAP = {
     'BOTAFOGO': 'botafogo',
     'FLUMINENSE': 'fluminense',
     'ATLÉTICO-MG': 'atlético mg',
+    'ATLÉTICO MG': 'atlético mg',
+    'ATLETICO MG': 'atlético mg',
     'CRUZEIRO': 'cruzeiro',
     'GRÊMIO': 'gremio',
     'INTERNACIONAL': 'internacional',
@@ -116,9 +118,9 @@ function updateArtTitle() {
     const artTitle = document.getElementById('artTitle');
     
     if (roundNumber && roundNumber.trim() !== '') {
-        artTitle.textContent = `DICAS POR POSIÇÃO - TCC - RODADA ${roundNumber}`;
+        artTitle.textContent = `DICAS POR POSIÇÃO - MD3 - RODADA ${roundNumber}`;
     } else {
-        artTitle.textContent = 'DICAS POR POSIÇÃO - TCC';
+        artTitle.textContent = 'DICAS POR POSIÇÃO - MD3';
     }
 }
 
@@ -141,6 +143,11 @@ async function loadCartolaData() {
                 atletas: apiData.atletas
             };
             console.log('Dados do Cartola processados:', Object.keys(cartolaData.atletas).length, 'jogadores');
+            
+            // Verificar se há técnicos nos dados
+            const tecnicos = Object.values(cartolaData.atletas).filter(atleta => atleta.posicao_id === 6);
+            console.log('Técnicos encontrados na API:', tecnicos.length);
+            console.log('Primeiros 3 técnicos:', tecnicos.slice(0, 3).map(t => ({ nome: t.apelido || t.nome, clube: t.clube_id })));
         } else {
             throw new Error('Estrutura de dados da API inválida');
         }
@@ -205,21 +212,34 @@ function handleFileUpload(event) {
 
 // Função para processar dados dos jogadores
 async function loadExampleData() {
-    try {
-        const response = await fetch('exemplo_rodada.csv');
-        if (response.ok) {
-            const csvText = await response.text();
-            parsePlayerData(csvText);
-            console.log('Arquivo de exemplo carregado automaticamente');
+    // Não carregar nenhum arquivo automaticamente
+    // Aguardar upload manual do usuário
+    console.log('Aguardando upload manual de arquivo CSV...');
+    
+    // Limpar dados existentes
+    playerData = [];
+    
+    // Limpar a arte
+    const positions = ['tecnicos', 'goleiros', 'laterais', 'zagueiros', 'meias', 'atacantes'];
+    positions.forEach(position => {
+        const container = document.querySelector(`#${position} .players-list`);
+        if (container) {
+            container.innerHTML = '';
         }
-    } catch (error) {
-        console.log('Arquivo de exemplo não encontrado, aguardando upload manual');
-    }
+    });
 }
 
 function parsePlayerData(content) {
+    console.log('=== INICIANDO PARSE DOS DADOS ===');
+    console.log('Conteúdo recebido:', content.substring(0, 200) + '...');
+    console.log('Total de linhas no arquivo:', content.trim().split('\n').length);
+    
     const lines = content.split('\n');
     playerData = [];
+    
+    console.log('=== PROCESSANDO DADOS DO ARQUIVO ===');
+    console.log('Total de linhas no arquivo:', lines.length);
+    console.log('Primeira linha (cabeçalho):', lines[0]);
     
     // Formato: pos,nome,clube,conf,cap,uni,rl (onde cap,uni,rl podem ser CAP,UNI,RL)
     for (let i = 1; i < lines.length; i++) {
@@ -236,20 +256,51 @@ function parsePlayerData(content) {
                 capitao: false,
                 unanimidade: false,
                 luxo: false,
+                fora20: false,
                 preco: null
             };
             
             // Verificar indicadores nas colunas restantes
-            // Formato: pos,nome,clube,conf,cap,uni,rl
+            // Formato: pos,nome,clube,conf,cap,uni,rl,fora20
             for (let j = 4; j < parts.length; j++) {
-                const indicator = parts[j].trim().toUpperCase();
-                if (indicator === 'CAP') {
+                const indicator = normalizeString(parts[j].trim());
+                
+                // Detectar capitão
+                if (indicator === 'cap' || indicator === 'capitao' || indicator === 'captain') {
                     player.capitao = true;
-                } else if (indicator === 'UNI') {
+                }
+                
+                // Detectar unanimidade
+                if (indicator === 'uni' || indicator === 'unanimidade' || indicator === 'unanime') {
                     player.unanimidade = true;
-                } else if (indicator === 'RL') {
+                }
+                
+                // Detectar reserva de luxo
+                if (indicator === 'rl' || indicator === 'reserva luxo' || indicator === 'luxo' || indicator === 'reserva de luxo') {
                     player.luxo = true;
                 }
+                
+                // Detectar fora dos 20+
+                if (indicator === 'fora 20' || indicator === 'fora dos 20' || indicator === 'fora20' || 
+                    indicator === 'fora' || indicator.includes('fora') && indicator.includes('20')) {
+                    player.fora20 = true;
+                }
+            }
+            
+            // Log específico para técnicos e Lyanco
+            if (player.posicao.toUpperCase() === 'TEC') {
+                console.log('=== TÉCNICO PROCESSADO ===');
+                console.log('Nome:', player.nome);
+                console.log('Clube:', player.clube);
+                console.log('Confiança:', player.confianca);
+            }
+            
+            if (player.nome.toLowerCase().includes('lyanco')) {
+                console.log('=== LYANCO PROCESSADO ===');
+                console.log('Posição:', player.posicao);
+                console.log('Nome:', player.nome);
+                console.log('Clube:', player.clube);
+                console.log('Confiança:', player.confianca);
             }
             
             // Buscar preço na API do Cartola
@@ -258,18 +309,41 @@ function parsePlayerData(content) {
         }
     }
     
-    console.log('Dados dos jogadores processados:', playerData);
+    // Log final do processamento
+    const jogadoresPorPosicao = {};
+    playerData.forEach(player => {
+        const pos = player.posicao.toUpperCase();
+        jogadoresPorPosicao[pos] = (jogadoresPorPosicao[pos] || 0) + 1;
+    });
+    
+    console.log('=== RESUMO DO PROCESSAMENTO ===');
+    console.log('Total de jogadores processados:', playerData.length);
+    console.log('Jogadores por posição:', jogadoresPorPosicao);
+    console.log('Dados completos dos jogadores:', playerData);
+    
+    // Arte será gerada manualmente pelo usuário
+    
     generateBtn.disabled = false;
 }
 
 // Função para normalizar nomes (remover acentos, espaços extras)
 function normalizeString(str) {
+    if (!str) return '';
     return str.normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[\u0300-\u036f]/g, '') // Remove acentos
+        .replace(/[íì]/g, 'i') // Substitui caracteres especiais específicos
+        .replace(/[áàâã]/g, 'a')
+        .replace(/[óòôõ]/g, 'o')
+        .replace(/[úùû]/g, 'u')
+        .replace(/[éèê]/g, 'e')
+        .replace(/[ç]/g, 'c')
         .toLowerCase()
         .trim()
-        .replace(/\s+/g, ' ')
-        .replace(/[^a-z0-9\s]/g, '');
+        .replace(/\s+/g, ' ') // Normaliza espaços múltiplos
+        .replace(/[^a-z0-9\s]/g, '') // Remove caracteres especiais
+        .replace(/\b(de|da|do|dos|das)\b/g, '') // Remove preposições comuns
+        .replace(/\s+/g, ' ') // Remove espaços extras após remoção de preposições
+        .trim();
 }
 
 // Função para normalizar nome de clube para busca de escudo
@@ -315,6 +389,31 @@ function getPlayerPrice(playerName, clubName) {
         return { price: null, found: false };
     }
     
+    // Log específico para técnicos
+    if (playerName.toLowerCase().includes('filipe') || playerName.toLowerCase().includes('vojvoda') || playerName.toLowerCase().includes('leo conde')) {
+        console.log('=== BUSCANDO TÉCNICO ===');
+        console.log('Nome do técnico:', playerName);
+        console.log('Total de atletas na API:', Object.keys(cartolaData.atletas).length);
+        
+        // Listar todos os técnicos disponíveis
+        const tecnicos = Object.values(cartolaData.atletas).filter(atleta => atleta.posicao_id === 6);
+        console.log('Técnicos disponíveis na API:', tecnicos.map(t => t.apelido || t.nome));
+    }
+    
+    // Log específico para Lyanco
+    if (playerName.toLowerCase().includes('lyanco')) {
+        console.log('=== BUSCANDO LYANCO ===');
+        console.log('Nome do jogador:', playerName);
+        console.log('Clube:', clubName);
+        
+        // Listar todos os zagueiros do Atlético MG
+        const zagueirosMG = Object.values(cartolaData.atletas).filter(atleta => 
+            atleta.posicao_id === 3 && 
+            (atleta.clube_id === 282 || (atleta.clube && atleta.clube.nome && atleta.clube.nome.toLowerCase().includes('atlético')))
+        );
+        console.log('Zagueiros do Atlético MG na API:', zagueirosMG.map(z => `${z.apelido || z.nome} (ID: ${z.atleta_id})`));
+    }
+    
     const normalizedPlayerName = normalizeString(playerName);
     const normalizedClubName = normalizeString(clubName);
     
@@ -323,9 +422,16 @@ function getPlayerPrice(playerName, clubName) {
     // Busca exata primeiro
     const exactMatch = Object.values(cartolaData.atletas).find(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
+        const atletaNomeOriginal = atleta.apelido || atleta.nome;
         const match = atletaNome === normalizedPlayerName;
+        
+        // Log específico para técnicos (posicao_id 6)
+        if (atleta.posicao_id === 6) {
+            console.log(`Técnico encontrado na API: ${atletaNomeOriginal} (normalizado: ${atletaNome}) - Comparando com: ${normalizedPlayerName}`);
+        }
+        
         if (match) {
-            console.log(`Match exato encontrado: ${atleta.apelido || atleta.nome} - Preço: ${atleta.preco_num}`);
+            console.log(`Match exato encontrado: ${atletaNomeOriginal} - Preço: ${atleta.preco_num}`);
         }
         return match;
     });
@@ -346,6 +452,25 @@ function getPlayerPrice(playerName, clubName) {
     
     if (similarMatch) {
         return { price: similarMatch.preco_num || similarMatch.preco, found: true, player: similarMatch, clubMismatch: true };
+    }
+    
+    // Busca específica para casos problemáticos
+    const specialCases = {
+        'filipe luis': 'filipe luis',
+        'lyanco': 'lyanco',
+        'vojvoda': 'vojvoda'
+    };
+    
+    if (specialCases[normalizedPlayerName]) {
+        const specialMatch = Object.values(cartolaData.atletas).find(atleta => {
+            const atletaNome = normalizeString(atleta.apelido || atleta.nome);
+            return atletaNome.includes(specialCases[normalizedPlayerName]);
+        });
+        
+        if (specialMatch) {
+            console.log(`Match especial encontrado: ${specialMatch.apelido || specialMatch.nome} - Preço: ${specialMatch.preco_num}`);
+            return { price: specialMatch.preco_num || specialMatch.preco, found: true, player: specialMatch };
+        }
     }
     
     console.log(`Jogador não encontrado: ${playerName}`);
@@ -386,7 +511,10 @@ function generateArt() {
     const notFoundPlayers = [];
     
     playerData.forEach(player => {
+        console.log(`Processando jogador: ${player.nome} - Posição: ${player.posicao}`);
         const positionKey = POSITION_MAP[player.posicao];
+        console.log(`Posição mapeada: ${positionKey}`);
+        
         if (positionKey) {
             // Verificar se jogador foi encontrado no mercado
             const priceData = getPlayerPrice(player.nome, player.clube);
@@ -398,6 +526,9 @@ function generateArt() {
                 playersByPosition[positionKey] = [];
             }
             playersByPosition[positionKey].push(player);
+            console.log(`Jogador ${player.nome} adicionado à posição ${positionKey}`);
+        } else {
+            console.log(`ERRO: Posição ${player.posicao} não encontrada no POSITION_MAP`);
         }
     });
     
@@ -405,9 +536,19 @@ function generateArt() {
     showErrorMessages(notFoundPlayers);
     
     // Renderizar jogadores em cada posição
+    console.log('Jogadores agrupados por posição:', playersByPosition);
     Object.entries(playersByPosition).forEach(([positionId, players]) => {
+        console.log(`Renderizando posição: ${positionId} com ${players.length} jogadores`);
         const container = document.getElementById(positionId);
         if (container) {
+            // Log específico para técnicos antes da ordenação
+            if (positionId === 'tecnicos') {
+                console.log('=== TÉCNICOS ANTES DA ORDENAÇÃO ===');
+                players.forEach(player => {
+                    console.log(`${player.nome} - Confiança: ${player.confianca} - Unanimidade: ${player.unanimidade}`);
+                });
+            }
+            
             // Ordenar jogadores: primeiro unanimidade, depois por confiança (A, B, C)
             const sortedPlayers = players.sort((a, b) => {
                 // Primeiro critério: unanimidade (unânimes primeiro)
@@ -423,7 +564,16 @@ function generateArt() {
                 return a.nome.localeCompare(b.nome);
             });
             
+            // Log específico para técnicos depois da ordenação
+            if (positionId === 'tecnicos') {
+                console.log('=== TÉCNICOS DEPOIS DA ORDENAÇÃO ===');
+                sortedPlayers.forEach(player => {
+                    console.log(`${player.nome} - Confiança: ${player.confianca} - Unanimidade: ${player.unanimidade}`);
+                });
+            }
+            
             sortedPlayers.forEach(player => {
+                console.log(`Criando elemento para: ${player.nome}`);
                 const playerElement = createPlayerElement(player);
                 container.appendChild(playerElement);
             });
@@ -502,9 +652,19 @@ function createPlayerElement(player) {
     const teamBadge = document.createElement('img');
     teamBadge.className = 'team-badge';
     const clubFileName = normalizeClubName(player.clube);
+    
+    // Log específico para Lyanco
+    if (player.nome.toLowerCase().includes('lyanco')) {
+        console.log('=== DEBUG LYANCO ESCUDO ===');
+        console.log('Clube original:', player.clube);
+        console.log('Clube normalizado:', clubFileName);
+        console.log('URL do escudo:', `public/escudos/${clubFileName}.png`);
+    }
+    
     teamBadge.src = `public/escudos/${clubFileName}.png`;
     teamBadge.alt = player.clube;
     teamBadge.onerror = function() {
+        console.log('Erro ao carregar escudo:', this.src);
         this.style.display = 'none';
     };
     
@@ -547,6 +707,17 @@ function createPlayerElement(player) {
         capIcon.onload = function() { console.log('Ícone de capitão carregado com sucesso'); };
         playerIcons.appendChild(capIcon);
         console.log('Ícone de capitão adicionado');
+    }
+    
+    if (player.fora20) {
+        const fora20Icon = document.createElement('img');
+        fora20Icon.src = 'public/icons/fora20.svg';
+        fora20Icon.className = 'icon';
+        fora20Icon.alt = 'Fora dos 20+ escalados';
+        fora20Icon.onerror = function() { console.error('Erro ao carregar ícone fora20'); };
+        fora20Icon.onload = function() { console.log('Ícone fora20 carregado com sucesso'); };
+        playerIcons.appendChild(fora20Icon);
+        console.log('Ícone fora20 adicionado');
     }
     
     console.log(`Total de ícones no container: ${playerIcons.children.length}`);
