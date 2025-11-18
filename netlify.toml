@@ -49,4 +49,4 @@
   NODE_ENV = "development"
   [functions]
 node_bundler = "esbuild"
-included_files = ["netlify/functions/**"]
+included_files = ["netlify/functions/**"] 
