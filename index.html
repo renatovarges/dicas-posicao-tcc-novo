@@ -168,5 +168,79 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="script.js?v=3.0"></script>
+ <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+
+    <button id="baixar-imagem" style="position:fixed;right:16px;bottom:16px;z-index:9999;padding:10px 14px;background:#0b5;color:#fff;border:none;border-radius:8px;cursor:pointer">Baixar imagem</button>
+    <script>
+      async function baixarPagina() {
+        const target = document.querySelector('#artLayout') || document.body;
+
+        const imgs = Array.from(document.querySelectorAll('img'));
+        const nodes = Array.from(document.querySelectorAll('*'));
+
+        imgs.forEach(img => {
+          img.setAttribute('crossorigin', 'anonymous');
+          if (img.src.startsWith('http') && !img.src.includes(location.origin)) {
+            const proxied = `${location.origin}/.netlify/functions/img-proxy?url=${encodeURIComponent(img.src)}`;
+            img.setAttribute('data-original-src', img.src);
+            img.src = proxied;
+          }
+        });
+
+        const urlFromBg = s => {
+          const v = s.backgroundImage || '';
+          const m = v.match(/url\((?:'|")?(.*?)(?:'|")?\)/i);
+          return m && m[1] ? m[1] : null;
+        };
+
+        nodes.forEach(n => {
+          const s = getComputedStyle(n);
+          const bgUrl = urlFromBg(s);
+          if (bgUrl && bgUrl.startsWith('http') && !bgUrl.includes(location.origin)) {
+            const proxied = `${location.origin}/.netlify/functions/img-proxy?url=${encodeURIComponent(bgUrl)}`;
+            n.setAttribute('data-original-bg', s.backgroundImage);
+            n.style.backgroundImage = `url(${proxied})`;
+          }
+          if (s.filter && s.filter !== 'none') n.style.filter = 'none';
+          if (s.mixBlendMode && s.mixBlendMode !== 'normal') n.style.mixBlendMode = 'normal';
+          if (s.backdropFilter && s.backdropFilter !== 'none') n.style.backdropFilter = 'none';
+        });
+
+        const dataUrl = await htmlToImage.toPng(target, {
+          cacheBust: true,
+          pixelRatio: 2,
+          canvasWidth: target.scrollWidth,
+          canvasHeight: target.scrollHeight
+        });
+
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = 'dica-cartola.png';
+        a.click();
+
+        imgs.forEach(img => {
+          const orig = img.getAttribute('data-original-src');
+          if (orig) {
+            img.src = orig;
+            img.removeAttribute('data-original-src');
+          }
+        });
+
+        nodes.forEach(n => {
+          const origBg = n.getAttribute('data-original-bg');
+          if (origBg) {
+            n.style.backgroundImage = origBg;
+            n.removeAttribute('data-original-bg');
+          }
+          n.style.filter = '';
+          n.style.mixBlendMode = '';
+          n.style.backdropFilter = '';
+        });
+      }
+
+      document.getElementById('baixar-imagem').addEventListener('click', baixarPagina);
+    </script>
+</body>
+</html>
 </body>
 </html>
