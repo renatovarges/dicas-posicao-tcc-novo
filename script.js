@@ -2,6 +2,7 @@
 const CARTOLA_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
     ? 'https://api.cartola.globo.com/atletas/mercado'
     : '/.netlify/functions/cartola-api';
+const GATOMESTRE_API_URL = 'https://api.cartola.globo.com/auth/gatomestre/atletas';
 const CANVAS_WIDTH = 2900;
 const CANVAS_HEIGHT = 4800;
 
@@ -43,6 +44,8 @@ const CLUB_MAP = {
 
 // Variáveis globais
 let cartolaData = null;
+let gatoMestreData = null;
+let gatoMestreToken = localStorage.getItem('gatoMestreToken') || '';
 let playerData = [];
 
 // Elementos DOM
@@ -66,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const downloadPdfBtn = document.getElementById('downloadPdfBtn');
     const downloadPdfVectorBtn = document.getElementById('downloadPdfVectorBtn');
     const roundNumberInput = document.getElementById('roundNumber');
+    const saveTokenBtn = document.getElementById('saveTokenBtn');
+    const gatoMestreTokenInput = document.getElementById('gatoMestreToken');
     
     fileInput.addEventListener('change', handleFileUpload);
     generateBtn.addEventListener('click', generateArt);
@@ -74,10 +79,26 @@ document.addEventListener('DOMContentLoaded', function() {
     downloadPdfBtn.addEventListener('click', () => downloadImage('pdf'));
     downloadPdfVectorBtn.addEventListener('click', () => downloadImage('pdf-vector'));
     roundNumberInput.addEventListener('input', updateArtTitle);
+    saveTokenBtn.addEventListener('click', () => {
+        const token = gatoMestreTokenInput.value.trim();
+        if (token) {
+            setGatoMestreToken(token);
+            alert('Token salvo com sucesso! Os dados de MPV serão carregados.');
+        } else {
+            alert('Por favor, insira um token válido.');
+        }
+    });
+    
+    // Carregar token salvo no campo de input
+    if (gatoMestreToken) {
+        gatoMestreTokenInput.value = gatoMestreToken;
+    }
     
     // Carregar dados do Cartola na inicialização
     loadCartolaData().then(() => {
         console.log('Dados do Cartola carregados na inicialização');
+        // Carregar dados do Gato Mestre
+        loadGatoMestreData();
         // Carregar arquivo de exemplo automaticamente após carregar dados do Cartola
         loadExampleData();
     });
@@ -195,6 +216,64 @@ function parseLocalCSV(csvText) {
     }
     
     return { atletas: players };
+}
+
+// Função para carregar dados da API do Gato Mestre
+async function loadGatoMestreData() {
+    if (!gatoMestreToken || gatoMestreToken.trim() === '') {
+        console.log('Token do Gato Mestre não configurado. MPV não será exibido.');
+        return;
+    }
+    
+    try {
+        console.log('Carregando dados do Gato Mestre...');
+        const response = await fetch(GATOMESTRE_API_URL, {
+            method: 'GET',
+            headers: {
+                'Authorization': gatoMestreToken,
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401 || response.status === 403) {
+                console.error('Token do Gato Mestre inválido ou expirado. Por favor, atualize o token.');
+                alert('Token do Gato Mestre expirado. Por favor, atualize o token nas configurações.');
+                return;
+            }
+            throw new Error(`Erro na API do Gato Mestre: ${response.status}`);
+        }
+        
+        gatoMestreData = await response.json();
+        console.log('Dados do Gato Mestre carregados:', Object.keys(gatoMestreData).length, 'jogadores');
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados do Gato Mestre:', error);
+        gatoMestreData = null;
+    }
+}
+
+// Função para configurar o token do Gato Mestre
+function setGatoMestreToken(token) {
+    gatoMestreToken = token;
+    localStorage.setItem('gatoMestreToken', token);
+    console.log('Token do Gato Mestre salvo com sucesso');
+    // Recarregar dados do Gato Mestre com o novo token
+    loadGatoMestreData();
+}
+
+// Função para obter MPV de um jogador
+function getPlayerMPV(atletaId) {
+    if (!gatoMestreData || !atletaId) {
+        return null;
+    }
+    
+    const playerData = gatoMestreData[atletaId];
+    if (playerData && playerData.minimo_para_valorizar !== undefined) {
+        return playerData.minimo_para_valorizar;
+    }
+    
+    return null;
 }
 
 // Função para processar upload de arquivo
@@ -727,6 +806,20 @@ function createPlayerElement(player) {
         playerPrice.textContent = price.toFixed(2);
     }
     
+    // Mínimo Para Valorizar (MPV)
+    const playerMPV = document.createElement('span');
+    playerMPV.className = 'player-mpv';
+    if (priceData.found && priceData.player && priceData.player.atleta_id) {
+        const mpv = getPlayerMPV(priceData.player.atleta_id);
+        if (mpv !== null) {
+            playerMPV.textContent = mpv.toFixed(2);
+        } else {
+            playerMPV.textContent = '-';
+        }
+    } else {
+        playerMPV.textContent = '-';
+    }
+    
     // Montar estrutura
     playerInfo.appendChild(teamBadge);
     playerInfo.appendChild(playerName);
@@ -735,6 +828,7 @@ function createPlayerElement(player) {
     playerRow.appendChild(playerInfo);
     playerRow.appendChild(confidenceLevel);
     playerRow.appendChild(playerPrice);
+    playerRow.appendChild(playerMPV);
     
     return playerRow;
 }

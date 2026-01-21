@@ -410,7 +410,8 @@ body {
     z-index: 1;
     align-items: center;
     line-height: 1;
-    width: 200px;
+    width: 340px;
+    gap: 10px;
 }
 
 .header-labels span:first-child {
@@ -418,9 +419,14 @@ body {
     min-width: 60px;
 }
 
-.header-labels span:last-child {
+.header-labels span:nth-child(2) {
     text-align: center;
     min-width: 140px;
+}
+
+.header-labels span:last-child {
+    text-align: center;
+    min-width: 130px;
 }
 
 /* Lista de jogadores */
@@ -599,6 +605,17 @@ body {
     font-weight: bold;
     color: #ffffff;
     min-width: 140px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-mpv {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffd700;
+    min-width: 130px;
     text-align: center;
     display: flex;
     align-items: center;
