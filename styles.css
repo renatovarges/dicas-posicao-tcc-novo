@@ -490,18 +490,35 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    /* Sombra mais profunda e suave */
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+    /* Borda sutil para destacar o círculo branco */
+    border: 2px solid rgba(255, 255, 255, 0.9);
     overflow: hidden;
+    /* Forçar renderização em alta qualidade */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transform: translateZ(0) scale(1.0, 1.0);
+    transform: translateZ(0) scale(1.0, 1.0);
 }
 
 .team-badge-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* Otimização para alta qualidade */
+    /* Máxima qualidade de renderização */
     image-rendering: -webkit-optimize-contrast;
-    image-rendering: high-quality;
+    image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    /* Nitidez e contraste aprimorados */
+    filter: contrast(1.05) saturate(1.1);
+    /* Anti-aliasing suave */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Forçar GPU acceleration */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .player-icons {
