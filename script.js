@@ -485,7 +485,7 @@ function normalizeClubName(clubName) {
     console.log(`[normalizeClubName] Clube original: "${clubName}" | Normalizado: "${normalized}"`);
     
     for (const [key, variations] of Object.entries(clubMap)) {
-        if (variations.some(variation => normalized.includes(normalizeString(variation.toLowerCase())))) {
+        if (variations.some(variation => normalized === normalizeString(variation.toLowerCase()))) {
             console.log(`[normalizeClubName] Match encontrado: "${clubName}" → "${key}"`);
             return key;
         }
