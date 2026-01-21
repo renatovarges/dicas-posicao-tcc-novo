@@ -35,13 +35,15 @@ const CLUB_MAP = {
     'GRÊMIO': 'gremio',
     'INTERNACIONAL': 'internacional',
     'BAHIA': 'bahia',
-    'SPORT': 'sport',
-    'CEARÁ': 'ceará',
-    'FORTALEZA': 'fortaleza',
     'VITÓRIA': 'vitória',
-    'JUVENTUDE': 'juventude',
     'RED BULL BRAGANTINO': 'red bull bragantino',
-    'MIRASSOL': 'mirassol'
+    'MIRASSOL': 'mirassol',
+    'ATHLETICO-PR': 'athletico-pr',
+    'ATHLETICO PR': 'athletico-pr',
+    'ATHLETICO': 'athletico-pr',
+    'CORITIBA': 'coritiba',
+    'CHAPECOENSE': 'chapecoense',
+    'REMO': 'remo'
 };
 
 // Variáveis globais
