@@ -486,11 +486,12 @@ body {
     height: 52px;
     border-radius: 50%;
     object-fit: contain;
-    background: white;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
     padding: 0px;
     box-sizing: border-box;
     border: 1px solid #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 0 0 50px #ffffff;
     /* Otimização para alta qualidade */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: high-quality;
