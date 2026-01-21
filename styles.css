@@ -481,41 +481,16 @@ body {
     color: #ffffff;
 }
 
-.team-badge-container {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: #ffffff;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    position: relative;
-}
-
-.team-badge-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #ffffff;
-    border-radius: 50%;
-    z-index: 0;
-}
-
 .team-badge {
     width: 52px;
     height: 52px;
     border-radius: 50%;
     object-fit: contain;
+    background: white;
     padding: 0px;
     box-sizing: border-box;
-    position: relative;
-    z-index: 1;
+    border: 1px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     /* Otimização para alta qualidade */
     image-rendering: -webkit-optimize-contrast;
     image-rendering: high-quality;
