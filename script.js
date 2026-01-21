@@ -1,10 +1,6 @@
 // Configurações globais
-const CARTOLA_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'https://api.cartola.globo.com/atletas/mercado'
-    : '/.netlify/functions/cartola-api';
-const GATOMESTRE_API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8888/.netlify/functions/gatomestre-api'
-    : '/.netlify/functions/gatomestre-api';
+const CARTOLA_API_URL = 'https://api.cartola.globo.com/atletas/mercado';
+const GATOMESTRE_API_URL = '/api/gatomestre-api';
 const CANVAS_WIDTH = 2900;
 const CANVAS_HEIGHT = 4800;
 
