@@ -988,7 +988,15 @@ function downloadImage(format = 'png') {
         x: 0,
         y: 0,
         windowWidth: width,
-        windowHeight: optimizedHeight
+        windowHeight: optimizedHeight,
+        onclone: function(clonedDoc) {
+            // Forçar background branco nos wrappers de escudos
+            const wrappers = clonedDoc.querySelectorAll('.team-badge-wrapper');
+            wrappers.forEach(wrapper => {
+                wrapper.style.backgroundColor = '#ffffff';
+                wrapper.style.background = '#ffffff';
+            });
+        }
     }).then(canvas => {
         // Restaurar tamanho original
         artLayout.style.width = originalWidth;
