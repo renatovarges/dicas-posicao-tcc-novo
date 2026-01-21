@@ -495,8 +495,7 @@ function normalizeClubName(clubName) {
         }
     }
     
-    console.log(`[normalizeClubName] Nenhum match encontrado para "${clubName}", retornando normalizado: "${normalized}"`);}
-    
+    console.log(`[normalizeClubName] Nenhum match encontrado para "${clubName}", retornando normalizado: "${normalized}"`);
     return normalized.replace(/\s+/g, ' ');
 }
 
