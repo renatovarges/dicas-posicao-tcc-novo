@@ -584,6 +584,7 @@ body {
     line-height: 1;
     flex-shrink: 0;
     min-width: 75px;
+    max-width: 75px;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0;
@@ -607,22 +608,28 @@ body {
     font-size: 48px;
     font-weight: bold;
     color: #ffffff;
+    width: 140px;
     min-width: 140px;
+    max-width: 140px;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .player-mpv {
     font-size: 48px;
     font-weight: bold;
     color: #ffd700;
+    width: 130px;
     min-width: 130px;
+    max-width: 130px;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .player-mpv.mpv-green {
