@@ -278,6 +278,35 @@ function getPlayerMPV(atletaId) {
     return null;
 }
 
+// Função para determinar a cor do MPV baseada na posição e valor
+function getMPVColorClass(posicao, mpv) {
+    const pos = posicao.toUpperCase();
+    
+    // Técnicos, Goleiros e Zagueiros
+    if (pos === 'TEC' || pos === 'GOL' || pos === 'ZAG') {
+        if (mpv <= 2.5) return 'mpv-green';
+        if (mpv <= 6.0) return 'mpv-white';
+        return 'mpv-red';
+    }
+    
+    // Laterais
+    if (pos === 'LAT') {
+        if (mpv <= 3.0) return 'mpv-green';
+        if (mpv <= 6.5) return 'mpv-white';
+        return 'mpv-red';
+    }
+    
+    // Meias e Atacantes
+    if (pos === 'MEI' || pos === 'ATA') {
+        if (mpv <= 3.0) return 'mpv-green';
+        if (mpv <= 7.0) return 'mpv-white';
+        return 'mpv-red';
+    }
+    
+    // Padrão (branco) se não se encaixar em nenhuma regra
+    return 'mpv-white';
+}
+
 // Função para processar upload de arquivo
 function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -815,6 +844,11 @@ function createPlayerElement(player) {
         const mpv = getPlayerMPV(priceData.player.atleta_id);
         if (mpv !== null) {
             playerMPV.textContent = mpv.toFixed(2);
+            // Aplicar cor baseada na posição e valor do MPV
+            const colorClass = getMPVColorClass(player.posicao, mpv);
+            if (colorClass) {
+                playerMPV.classList.add(colorClass);
+            }
         } else {
             playerMPV.textContent = '-';
         }

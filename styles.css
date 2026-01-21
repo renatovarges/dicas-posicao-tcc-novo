@@ -622,6 +622,18 @@ body {
     justify-content: center;
 }
 
+.player-mpv.mpv-green {
+    color: #00FF00;
+}
+
+.player-mpv.mpv-white {
+    color: #FFFFFF;
+}
+
+.player-mpv.mpv-red {
+    color: #FF0000;
+}
+
 /* Footer */
 .footer {
     position: absolute;
