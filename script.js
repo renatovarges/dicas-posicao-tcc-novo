@@ -476,16 +476,26 @@ function normalizeClubName(clubName) {
         'vitória': ['vitória', 'vitoria', 'vit', 'leao da barra'],
         'juventude': ['juventude', 'juv', 'papo'],
         'red bull bragantino': ['red bull bragantino', 'bragantino', 'rbr', 'red bull'],
-        'mirassol': ['mirassol', 'mir']
+        'mirassol': ['mirassol', 'mir'],
+        'athletico-pr': ['athletico-pr', 'athletico pr', 'athletico', 'cap', 'furacao'],
+        'coritiba': ['coritiba', 'coxa', 'cfc'],
+        'chapecoense': ['chapecoense', 'chape', 'verdao'],
+        'remo': ['remo', 'leao azul']
     };
     
     const normalized = normalizeString(clubName.toLowerCase());
     
+    // Log para debug de clubes
+    console.log(`[normalizeClubName] Clube original: "${clubName}" | Normalizado: "${normalized}"`);
+    
     for (const [key, variations] of Object.entries(clubMap)) {
         if (variations.some(variation => normalized.includes(normalizeString(variation.toLowerCase())))) {
+            console.log(`[normalizeClubName] Match encontrado: "${clubName}" → "${key}"`);
             return key;
         }
     }
+    
+    console.log(`[normalizeClubName] Nenhum match encontrado para "${clubName}", retornando normalizado: "${normalized}"`);}
     
     return normalized.replace(/\s+/g, ' ');
 }
