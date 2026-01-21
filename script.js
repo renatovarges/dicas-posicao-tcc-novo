@@ -761,9 +761,12 @@ function createPlayerElement(player) {
     playerName.className = 'player-name';
     playerName.textContent = player.nome.toUpperCase();
     
-    // Escudo do time
+    // Escudo do time com div de fundo branco
+    const teamBadgeWrapper = document.createElement('div');
+    teamBadgeWrapper.className = 'team-badge-wrapper';
+    
     const teamBadge = document.createElement('img');
-    teamBadge.className = 'team-badge';
+    teamBadge.className = 'team-badge-img';
     const clubFileName = normalizeClubName(player.clube);
     
     // Log específico para Lyanco
@@ -780,6 +783,8 @@ function createPlayerElement(player) {
         console.log('Erro ao carregar escudo:', this.src);
         this.style.display = 'none';
     };
+    
+    teamBadgeWrapper.appendChild(teamBadge);
     
     // Criar container de ícones
     const playerIcons = document.createElement('div');
@@ -871,7 +876,7 @@ function createPlayerElement(player) {
     playerData.appendChild(playerMPV);
     
     // Montar estrutura
-    playerInfo.appendChild(teamBadge);
+    playerInfo.appendChild(teamBadgeWrapper);
     playerInfo.appendChild(playerName);
     playerInfo.appendChild(playerIcons);
     
@@ -985,51 +990,6 @@ function downloadImage(format = 'png') {
         windowWidth: width,
         windowHeight: optimizedHeight
     }).then(canvas => {
-        // Desenhar círculos brancos sobre os escudos no canvas
-        const ctx = canvas.getContext('2d');
-        const badges = artLayout.querySelectorAll('.team-badge');
-        
-        badges.forEach(badge => {
-            const rect = badge.getBoundingClientRect();
-            const layoutRect = artLayout.getBoundingClientRect();
-            
-            // Calcular posição relativa ao layout
-            const x = (rect.left - layoutRect.left) * safeScale;
-            const y = (rect.top - layoutRect.top) * safeScale;
-            const radius = (52 / 2) * safeScale; // 52px é o tamanho do badge
-            const centerX = x + radius;
-            const centerY = y + radius;
-            
-            // Desenhar círculo branco
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-            
-            // Desenhar sombra (opcional, para manter consistência visual)
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-            ctx.shadowBlur = 8 * safeScale;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 2 * safeScale;
-            ctx.fill();
-            
-            // Resetar sombra
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            
-            // Redesenhar a imagem do escudo sobre o círculo branco
-            if (badge.complete && badge.naturalWidth > 0) {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.clip();
-                ctx.drawImage(badge, x, y, 52 * safeScale, 52 * safeScale);
-                ctx.restore();
-            }
-        });
-        
         // Restaurar tamanho original
         artLayout.style.width = originalWidth;
         artLayout.style.height = originalHeight;
