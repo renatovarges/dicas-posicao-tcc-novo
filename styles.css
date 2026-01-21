@@ -410,8 +410,8 @@ body {
     z-index: 1;
     align-items: center;
     line-height: 1;
-    width: 340px;
-    gap: 10px;
+    width: 400px;
+    gap: 20px;
 }
 
 .header-labels span:first-child {
@@ -445,7 +445,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 30px;
+    padding: 20px 45px;
     background: rgba(0,0,0,0.6);
     border-radius: 12px;
     border-left: 5px solid #2d7d2d;

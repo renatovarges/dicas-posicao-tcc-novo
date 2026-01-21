@@ -834,7 +834,7 @@ function createPlayerElement(player) {
         playerPrice.textContent = 'N/E';
     } else {
         const price = priceData.price || 0;
-        playerPrice.textContent = price.toFixed(2);
+        playerPrice.textContent = price.toFixed(1);
     }
     
     // Mínimo Para Valorizar (MPV)
@@ -843,7 +843,7 @@ function createPlayerElement(player) {
     if (priceData.found && priceData.player && priceData.player.atleta_id) {
         const mpv = getPlayerMPV(priceData.player.atleta_id);
         if (mpv !== null) {
-            playerMPV.textContent = mpv.toFixed(2);
+            playerMPV.textContent = mpv.toFixed(1);
             // Aplicar cor baseada na posição e valor do MPV
             const colorClass = getMPVColorClass(player.posicao, mpv);
             if (colorClass) {
