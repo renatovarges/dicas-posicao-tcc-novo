@@ -1,6 +1,6 @@
 // Configurações globais
-const CARTOLA_API_URL = 'https://api.cartola.globo.com/atletas/mercado';
-const GATOMESTRE_API_URL = '/api/gatomestre-api';
+const CARTOLA_API_URL = '/.netlify/functions/cartola-api';
+const GATOMESTRE_API_URL = '/.netlify/functions/gatomestre-api';
 const CANVAS_WIDTH = 2900;
 const CANVAS_HEIGHT = 4800;
 
