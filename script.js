@@ -761,7 +761,10 @@ function createPlayerElement(player) {
     playerName.className = 'player-name';
     playerName.textContent = player.nome.toUpperCase();
     
-    // Escudo do time
+    // Escudo do time com container de fundo branco
+    const teamBadgeContainer = document.createElement('div');
+    teamBadgeContainer.className = 'team-badge-container';
+    
     const teamBadge = document.createElement('img');
     teamBadge.className = 'team-badge';
     const clubFileName = normalizeClubName(player.clube);
@@ -780,6 +783,8 @@ function createPlayerElement(player) {
         console.log('Erro ao carregar escudo:', this.src);
         this.style.display = 'none';
     };
+    
+    teamBadgeContainer.appendChild(teamBadge);
     
     // Criar container de ícones
     const playerIcons = document.createElement('div');
@@ -871,7 +876,7 @@ function createPlayerElement(player) {
     playerData.appendChild(playerMPV);
     
     // Montar estrutura
-    playerInfo.appendChild(teamBadge);
+    playerInfo.appendChild(teamBadgeContainer);
     playerInfo.appendChild(playerName);
     playerInfo.appendChild(playerIcons);
     
