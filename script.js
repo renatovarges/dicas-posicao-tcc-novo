@@ -768,18 +768,18 @@ function createPlayerElement(player) {
     // Criar SVG com círculo branco (sempre renderizado pelo html2canvas)
     const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('width', '70');
-    svg.setAttribute('height', '70');
-    svg.setAttribute('viewBox', '0 0 70 70');
+    svg.setAttribute('width', '85');
+    svg.setAttribute('height', '85');
+    svg.setAttribute('viewBox', '0 0 85 85');
     svg.style.position = 'absolute';
     svg.style.top = '0';
     svg.style.left = '0';
     svg.style.zIndex = '0';
     
     const circle = document.createElementNS(svgNS, 'circle');
-    circle.setAttribute('cx', '35');
-    circle.setAttribute('cy', '35');
-    circle.setAttribute('r', '35');
+    circle.setAttribute('cx', '42.5');
+    circle.setAttribute('cy', '42.5');
+    circle.setAttribute('r', '42.5');
     circle.setAttribute('fill', '#ffffff');
     
     svg.appendChild(circle);
