@@ -765,6 +765,26 @@ function createPlayerElement(player) {
     const teamBadgeWrapper = document.createElement('div');
     teamBadgeWrapper.className = 'team-badge-wrapper';
     
+    // Criar SVG com círculo branco (sempre renderizado pelo html2canvas)
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '70');
+    svg.setAttribute('height', '70');
+    svg.setAttribute('viewBox', '0 0 70 70');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.zIndex = '0';
+    
+    const circle = document.createElementNS(svgNS, 'circle');
+    circle.setAttribute('cx', '35');
+    circle.setAttribute('cy', '35');
+    circle.setAttribute('r', '35');
+    circle.setAttribute('fill', '#ffffff');
+    
+    svg.appendChild(circle);
+    teamBadgeWrapper.appendChild(svg);
+    
     const teamBadge = document.createElement('img');
     teamBadge.className = 'team-badge-img';
     const clubFileName = normalizeClubName(player.clube);
