@@ -1,73 +1,39 @@
 // Configurações globais
-// Última atualização: 21/01/2026 - Solução Access Token Manual (1 hora)
 const CARTOLA_API_URL = '/.netlify/functions/cartola-api';
-const GATOMESTRE_API_URL = 'https://api.cartola.globo.com/gato-mestre/mercado';
+const GATOMESTRE_API_URL = '/.netlify/functions/gatomestre-api';
 const CANVAS_WIDTH = 2900;
 const CANVAS_HEIGHT = 4800;
 
 // Mapeamento de posições
 const POSITION_MAP = {
-    'TEC': 'tecnicos',
-    'GOL': 'goleiros', 
-    'LAT': 'laterais',
-    'ZAG': 'zagueiros',
-    'MEI': 'meias',
-    'ATA': 'atacantes'
+    'TEC': 'tecnicos', 'GOL': 'goleiros', 'LAT': 'laterais',
+    'ZAG': 'zagueiros', 'MEI': 'meias', 'ATA': 'atacantes'
 };
 
 // Mapeamento de clubes
 const CLUB_MAP = {
-    'FLAMENGO': 'flamengo',
-    'PALMEIRAS': 'palmeiras',
-    'CORINTHIANS': 'corinthians',
-    'SÃO PAULO': 'são paulo',
-    'SANTOS': 'santos',
-    'VASCO': 'vasco',
-    'BOTAFOGO': 'botafogo',
-    'FLUMINENSE': 'fluminense',
-    'ATLÉTICO-MG': 'atlético mg',
-    'ATLÉTICO MG': 'atlético mg',
-    'ATLETICO MG': 'atlético mg',
-    'CRUZEIRO': 'cruzeiro',
-    'GRÊMIO': 'gremio',
-    'INTERNACIONAL': 'internacional',
-    'BAHIA': 'bahia',
-    'VITÓRIA': 'vitória',
-    'RED BULL BRAGANTINO': 'red bull bragantino',
-    'MIRASSOL': 'mirassol',
-    'ATHLETICO-PR': 'athletico-pr',
-    'ATHLETICO PR': 'athletico-pr',
-    'ATHLETICO': 'athletico-pr',
-    'CORITIBA': 'coritiba',
-    'Coritiba': 'coritiba',
-    'coritiba': 'coritiba',
-    'CHAPECOENSE': 'chapecoense',
-    'Chapecoense': 'chapecoense',
-    'chapecoense': 'chapecoense',
-    'REMO': 'remo',
-    'Remo': 'remo',
-    'remo': 'remo'
+    'FLAMENGO': 'flamengo', 'PALMEIRAS': 'palmeiras', 'CORINTHIANS': 'corinthians',
+    'SÃO PAULO': 'são paulo', 'SANTOS': 'santos', 'VASCO': 'vasco',
+    'BOTAFOGO': 'botafogo', 'FLUMINENSE': 'fluminense', 'ATLÉTICO-MG': 'atlético mg',
+    'ATLÉTICO MG': 'atlético mg', 'ATLETICO MG': 'atlético mg', 'CRUZEIRO': 'cruzeiro',
+    'GRÊMIO': 'gremio', 'INTERNACIONAL': 'internacional', 'BAHIA': 'bahia',
+    'VITÓRIA': 'vitória', 'RED BULL BRAGANTINO': 'red bull bragantino', 'MIRASSOL': 'mirassol',
+    'ATHLETICO-PR': 'athletico-pr', 'ATHLETICO PR': 'athletico-pr', 'ATHLETICO': 'athletico-pr',
+    'CORITIBA': 'coritiba', 'Coritiba': 'coritiba', 'coritiba': 'coritiba',
+    'CHAPECOENSE': 'chapecoense', 'Chapecoense': 'chapecoense', 'chapecoense': 'chapecoense',
+    'REMO': 'remo', 'Remo': 'remo', 'remo': 'remo'
 };
 
-// Variáveis globais
-let cartolaData = null;
-let gatoMestreData = null;
+let cartolaData = null, gatoMestreData = null, playerData = [];
 let gatoMestreToken = localStorage.getItem('gatoMestreToken') || '';
-let playerData = [];
-
-// Elementos DOM
 let artLayout, canvas, ctx, generateBtn;
 
-// Inicializar elementos DOM após carregamento
 function initializeDOM() {
     artLayout = document.getElementById('artLayout');
     canvas = document.getElementById('artCanvas');
-    if (canvas) {
-        ctx = canvas.getContext('2d');
-    }
+    if (canvas) ctx = canvas.getContext('2d');
 }
 
-// Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('fileInput');
     generateBtn = document.getElementById('generateBtn');
@@ -90,35 +56,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const token = gatoMestreTokenInput.value.trim();
         if (token) {
             setGatoMestreToken(token);
-            alert('✅ Access Token salvo com sucesso! Dura 1 hora. Os dados de MPV serão carregados agora.');
+            alert('✅ Access Token salvo! Dura 1 hora. Clique em "Atualizar Mercado" para carregar os dados.');
         } else {
             alert('⚠️ Por favor, insira um Access Token válido.');
         }
     });
     
-    // Carregar Access Token salvo no campo de input
     const savedToken = localStorage.getItem('gatoMestreToken');
-    if (savedToken) {
-        gatoMestreTokenInput.value = savedToken;
-    }
+    if (savedToken) gatoMestreTokenInput.value = savedToken;
     
-    // Carregar dados do Cartola na inicialização
     loadCartolaData().then(() => {
         console.log('Dados do Cartola carregados na inicialização');
-        // Carregar dados do Gato Mestre se houver token
-        if (gatoMestreToken) {
-            loadGatoMestreData();
-        }
+        if (gatoMestreToken) loadGatoMestreData();
     });
     
-    // Forçar atualização dos dados a cada 5 minutos
     setInterval(() => {
         console.log('Atualizando dados do Cartola automaticamente...');
         loadCartolaData();
     }, 5 * 60 * 1000);
 });
 
-// Função para atualizar dados do mercado
 function updateMarketData() {
     const btn = document.getElementById('updateMarketBtn');
     btn.textContent = 'Atualizando...';
@@ -134,7 +91,6 @@ function updateMarketData() {
     });
 }
 
-// Função para mostrar mensagens de erro
 function showErrorMessages(errors) {
     const errorDiv = document.getElementById('errorMessages');
     if (errors.length > 0) {
@@ -145,11 +101,9 @@ function showErrorMessages(errors) {
     }
 }
 
-// Função para atualizar o título da arte com o número da rodada
 function updateArtTitle() {
     const roundNumber = document.getElementById('roundNumber').value;
     const artTitle = document.getElementById('artTitle');
-    
     if (roundNumber && roundNumber.trim() !== '') {
         artTitle.textContent = `DICAS POR POSIÇÃO - TCC - RODADA ${roundNumber}`;
     } else {
@@ -157,36 +111,23 @@ function updateArtTitle() {
     }
 }
 
-// Função para carregar dados da API do Cartola
 async function loadCartolaData() {
     try {
         console.log('Carregando dados do Cartola...');
         const response = await fetch(CARTOLA_API_URL);
-        
-        if (!response.ok) {
-            throw new Error(`Erro na API: ${response.status}`);
-        }
-        
+        if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
         const apiData = await response.json();
-        
         if (apiData && apiData.atletas) {
-            cartolaData = {
-                atletas: apiData.atletas
-            };
-            console.log('Dados do Cartola processados:', Object.keys(cartolaData.atletas).length, 'jogadores');
-        } else {
-            throw new Error('Estrutura de dados da API inválida');
+            cartolaData = { atletas: apiData.atletas };
+            console.log('✅ Dados do Cartola:', Object.keys(cartolaData.atletas).length, 'jogadores');
         }
-        
     } catch (error) {
-        console.error('Erro ao carregar dados do Cartola:', error);
+        console.error('❌ Erro ao carregar Cartola:', error);
     }
 }
 
-// Função para carregar dados da API do Gato Mestre
 async function loadGatoMestreData() {
     const accessToken = localStorage.getItem('gatoMestreToken');
-    
     if (!accessToken || accessToken.trim() === '') {
         console.log('⚠️ Access Token não configurado.');
         return;
@@ -194,11 +135,7 @@ async function loadGatoMestreData() {
     
     try {
         console.log('🔄 Carregando dados do Gato Mestre...');
-        // Usando o proxy do AllOrigins para evitar erro de CORS no navegador
-        const targetUrl = encodeURIComponent(GATOMESTRE_API_URL);
-        const proxyUrl = `https://api.allorigins.win/get?url=${targetUrl}`;
-        
-        const response = await fetch(proxyUrl, {
+        const response = await fetch(GATOMESTRE_API_URL, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -206,42 +143,33 @@ async function loadGatoMestreData() {
         });
         
         if (!response.ok) {
-            throw new Error(`Erro no Proxy: ${response.status}`);
+            console.error(`❌ Erro ${response.status} ao buscar Gato Mestre`);
+            if (response.status === 401) {
+                alert('⚠️ Access Token expirado! Cole um novo token.');
+            }
+            return;
         }
         
-        const proxyData = await response.json();
-        gatoMestreData = JSON.parse(proxyData.contents);
-        console.log('✅ Dados do Gato Mestre carregados:', Object.keys(gatoMestreData).length, 'jogadores');
+        gatoMestreData = await response.json();
+        console.log('✅ Dados do Gato Mestre:', Object.keys(gatoMestreData).length, 'jogadores');
         
     } catch (error) {
-        console.error('❌ Erro ao carregar dados do Gato Mestre:', error);
-        // Tentar sem proxy como fallback (pode dar CORS)
-        try {
-            const response = await fetch(GATOMESTRE_API_URL, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
-            if (response.ok) {
-                gatoMestreData = await response.json();
-            }
-        } catch (e) {}
+        console.error('❌ Erro ao carregar Gato Mestre:', error);
     }
 }
 
-// Função para configurar o Access Token do Gato Mestre
 function setGatoMestreToken(token) {
     localStorage.setItem('gatoMestreToken', token);
     gatoMestreToken = token;
     loadGatoMestreData();
 }
 
-// Função para obter MPV de um jogador
 function getPlayerMPV(atletaId) {
     if (!gatoMestreData || !atletaId) return null;
-    const playerData = gatoMestreData[atletaId];
-    return (playerData && playerData.minimo_para_valorizar !== undefined) ? playerData.minimo_para_valorizar : null;
+    const player = gatoMestreData[atletaId];
+    return (player && player.minimo_para_valorizar !== undefined) ? player.minimo_para_valorizar : null;
 }
 
-// Função para determinar a cor do MPV
 function getMPVColorClass(posicao, mpv) {
     const pos = posicao.toUpperCase();
     if (pos === 'TEC' || pos === 'GOL' || pos === 'ZAG') {
@@ -262,7 +190,6 @@ function getMPVColorClass(posicao, mpv) {
     return 'mpv-white';
 }
 
-// Função para processar upload de arquivo
 function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -397,7 +324,7 @@ function generateArt() {
 
 function downloadImage(format) {
     const roundNumber = document.getElementById('roundNumber').value || 'X';
-    const filename = `dicas-md3-rodada-${roundNumber}`;
+    const filename = `dicas-tcc-rodada-${roundNumber}`;
     if (format === 'png') {
         canvas.toBlob(blob => {
             const url = URL.createObjectURL(blob);
