@@ -856,15 +856,20 @@ function createPlayerElement(player) {
         playerMPV.textContent = '-';
     }
     
+    // Criar container para os dados (C, C$, MPV)
+    const playerData = document.createElement('div');
+    playerData.className = 'player-data';
+    playerData.appendChild(confidenceLevel);
+    playerData.appendChild(playerPrice);
+    playerData.appendChild(playerMPV);
+    
     // Montar estrutura
     playerInfo.appendChild(teamBadge);
     playerInfo.appendChild(playerName);
     playerInfo.appendChild(playerIcons);
     
     playerRow.appendChild(playerInfo);
-    playerRow.appendChild(confidenceLevel);
-    playerRow.appendChild(playerPrice);
-    playerRow.appendChild(playerMPV);
+    playerRow.appendChild(playerData);
     
     return playerRow;
 }

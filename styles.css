@@ -644,6 +644,15 @@ body {
     color: #FF0000;
 }
 
+.player-data {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 385px;
+    gap: 20px;
+    flex-shrink: 0;
+}
+
 /* Footer */
 .footer {
     position: absolute;
