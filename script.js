@@ -42,30 +42,6 @@ const CLUB_MAP = {
     'REMO': 'remo'
 };
 
-// Mapeamento de IDs de clubes do Cartola (atualizado para 2025)
-const CLUB_ID_MAP = {
-    'flamengo': 262,
-    'palmeiras': 275,
-    'corinthians': 264,
-    'são paulo': 276,
-    'santos': 277,
-    'vasco': 267,
-    'botafogo': 263,
-    'fluminense': 266,
-    'atlético mg': 282,
-    'cruzeiro': 283,
-    'gremio': 284,
-    'internacional': 285,
-    'bahia': 265,
-    'vitória': 373,
-    'red bull bragantino': 280,
-    'mirassol': 368,
-    'athletico-pr': 293,
-    'coritiba': 294,
-    'chapecoense': 292,
-    'remo': 356
-};
-
 // Variáveis globais
 let cartolaData = null;
 let gatoMestreData = null;
@@ -519,10 +495,7 @@ function normalizeClubName(clubName) {
     return normalized.replace(/\s+/g, ' ');
 }
 
-// ==================================================================================
-// ============================= FUNÇÃO CORRIGIDA ===================================
-// ==================================================================================
-// Função para buscar preço do jogador - VERSÃO CORRIGIDA COM VERIFICAÇÃO DE CLUBE
+// Função para buscar preço do jogador - CORRIGIDA
 function getPlayerPrice(playerName, clubName) {
     if (!cartolaData || !cartolaData.atletas) {
         console.log('Dados do Cartola não disponíveis para:', playerName);
@@ -531,93 +504,98 @@ function getPlayerPrice(playerName, clubName) {
     
     const normalizedPlayerName = normalizeString(playerName);
     const normalizedClubName = normalizeClubName(clubName);
+    
+    // Mapeamento de IDs dos clubes
+    const CLUB_ID_MAP = {
+        'flamengo': 262,
+        'palmeiras': 275,
+        'corinthians': 264,
+        'são paulo': 276,
+        'sao paulo': 276,
+        'santos': 277,
+        'vasco': 267,
+        'botafogo': 263,
+        'fluminense': 266,
+        'atletico mg': 282,
+        'atlético mg': 282,
+        'cruzeiro': 283,
+        'gremio': 284,
+        'internacional': 285,
+        'bahia': 265,
+        'vitoria': 373,
+        'vitória': 373,
+        'red bull bragantino': 280,
+        'bragantino': 280,
+        'mirassol': 368,
+        'athletico-pr': 293,
+        'athletico pr': 293,
+        'coritiba': 294,
+        'chapecoense': 292,
+        'remo': 356
+    };
+    
     const expectedClubId = CLUB_ID_MAP[normalizedClubName];
     
-    console.log(`\n=== BUSCANDO: ${playerName} | Clube: ${clubName} ===`);
-    console.log(`Nome normalizado: "${normalizedPlayerName}"`);
-    console.log(`Clube normalizado: "${normalizedClubName}"`);
-    console.log(`ID esperado do clube: ${expectedClubId}`);
+    console.log(`Buscando: ${playerName} do ${clubName} (clube_id: ${expectedClubId})`);
     
-    // Converter objeto de atletas em array para facilitar busca
     const atletasArray = Object.values(cartolaData.atletas);
     
-    // ETAPA 1: Busca exata pelo nome E clube
-    console.log('\n--- ETAPA 1: Busca exata (nome + clube) ---');
+    // ETAPA 1: Busca exata (nome + clube)
     const exactMatch = atletasArray.find(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
         const nomeMatch = atletaNome === normalizedPlayerName;
         const clubeMatch = atleta.clube_id === expectedClubId;
         
         if (nomeMatch && clubeMatch) {
-            console.log(`✓ MATCH EXATO: ${atleta.apelido || atleta.nome} | Clube ID: ${atleta.clube_id} | Preço: ${atleta.preco_num}`);
+            console.log(`✓ MATCH EXATO: ${atleta.apelido || atleta.nome} - Preço: ${atleta.preco_num}`);
             return true;
         }
         return false;
     });
     
     if (exactMatch) {
-        console.log(`✓✓✓ Jogador encontrado com match exato!`);
         return { price: exactMatch.preco_num || exactMatch.preco, found: true, player: exactMatch };
     }
     
-    // ETAPA 2: Busca por nome exato, mas sem verificar clube (caso o clube_id esteja diferente)
-    console.log('\n--- ETAPA 2: Busca exata apenas por nome ---');
+    // ETAPA 2: Busca por nome exato (sem verificar clube)
     const exactNameMatch = atletasArray.find(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
-        const nomeMatch = atletaNome === normalizedPlayerName;
+        const match = atletaNome === normalizedPlayerName;
         
-        if (nomeMatch) {
-            console.log(`? NOME EXATO encontrado: ${atleta.apelido || atleta.nome} | Clube ID: ${atleta.clube_id} | Preço: ${atleta.preco_num}`);
-            console.log(`  Clube esperado: ${expectedClubId} | Clube encontrado: ${atleta.clube_id}`);
-            return true;
+        if (match) {
+            console.log(`✓ Nome exato: ${atleta.apelido || atleta.nome} - Preço: ${atleta.preco_num}`);
+            if (atleta.clube_id !== expectedClubId) {
+                console.warn(`⚠ Clube diferente! Esperado: ${expectedClubId}, Encontrado: ${atleta.clube_id}`);
+            }
         }
-        return false;
+        return match;
     });
     
     if (exactNameMatch) {
-        // Verificar se é do clube esperado ou se há divergência
-        if (exactNameMatch.clube_id !== expectedClubId) {
-            console.warn(`⚠ ATENÇÃO: Nome encontrado mas clube diferente!`);
-            console.warn(`  Esperado: clube_id ${expectedClubId} (${clubName})`);
-            console.warn(`  Encontrado: clube_id ${exactNameMatch.clube_id}`);
-            // Ainda retornar, mas com aviso de possível divergência
-        }
-        console.log(`✓✓ Jogador encontrado por nome exato!`);
         return { price: exactNameMatch.preco_num || exactNameMatch.preco, found: true, player: exactNameMatch };
     }
     
-    // ETAPA 3: Busca similar POR PARTES do nome + VERIFICAÇÃO DE CLUBE
-    // Esta é a parte que estava causando o bug - agora verifica o clube!
-    console.log('\n--- ETAPA 3: Busca similar (nome parcial + clube) ---');
+    // ETAPA 3: Busca similar COM pontuação e verificação de clube (A CORREÇÃO PRINCIPAL!)
     const candidatos = [];
     
     atletasArray.forEach(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
-        
-        // Verificar se há match parcial no nome
         const nomeMatch = atletaNome.includes(normalizedPlayerName) || normalizedPlayerName.includes(atletaNome);
         
         if (nomeMatch) {
-            // Calcular score de similaridade
             let score = 0;
             
-            // Pontos por match de nome
-            if (atletaNome === normalizedPlayerName) {
-                score += 100; // Nome exato
-            } else if (atletaNome.includes(normalizedPlayerName)) {
-                score += 50; // Nome contém o buscado
-            } else if (normalizedPlayerName.includes(atletaNome)) {
-                score += 40; // Buscado contém o nome
-            } else {
-                score += 20; // Match parcial
+            // Pontos por qualidade do match
+            if (atletaNome === normalizedPlayerName) score += 100;
+            else if (atletaNome.includes(normalizedPlayerName)) score += 50;
+            else if (normalizedPlayerName.includes(atletaNome)) score += 40;
+            else score += 20;
+            
+            // PONTOS CRUCIAIS: mesmo clube (+1000 pontos)
+            if (expectedClubId && atleta.clube_id === expectedClubId) {
+                score += 1000;
             }
             
-            // Pontos CRUCIAIS por match de clube
-            if (atleta.clube_id === expectedClubId) {
-                score += 1000; // MUITO IMPORTANTE: mesmo clube
-            }
-            
-            // Adicionar à lista de candidatos
             candidatos.push({
                 atleta: atleta,
                 score: score,
@@ -628,37 +606,26 @@ function getPlayerPrice(playerName, clubName) {
         }
     });
     
-    // Ordenar candidatos por score (maior score = melhor match)
-    candidatos.sort((a, b) => b.score - a.score);
-    
-    // Log dos candidatos encontrados
     if (candidatos.length > 0) {
-        console.log(`Encontrados ${candidatos.length} candidatos:`);
-        candidatos.slice(0, 5).forEach((c, i) => {
-            const clubeMatch = c.clube_id === expectedClubId ? '✓ MESMO CLUBE' : '✗ clube diferente';
-            console.log(`  ${i+1}. ${c.nome} | Score: ${c.score} | Clube: ${c.clube_id} ${clubeMatch} | Preço: ${c.preco}`);
-        });
+        // Ordenar por score (maior score = melhor match)
+        candidatos.sort((a, b) => b.score - a.score);
+        const melhor = candidatos[0];
         
-        // Retornar o melhor candidato
-        const melhorCandidato = candidatos[0];
+        console.log(`✓ Match similar: ${melhor.nome} (score: ${melhor.score}) - Preço: ${melhor.preco}`);
         
-        if (melhorCandidato.clube_id === expectedClubId) {
-            console.log(`✓✓ Melhor candidato CONFIRMADO (mesmo clube)!`);
-        } else {
-            console.warn(`⚠ ATENÇÃO: Melhor candidato é de clube diferente!`);
-            console.warn(`  Isso pode indicar que o jogador mudou de time ou há erro no arquivo TXT`);
+        if (expectedClubId && melhor.clube_id !== expectedClubId) {
+            console.warn(`⚠ Clube diferente no melhor match!`);
         }
         
         return { 
-            price: melhorCandidato.preco, 
+            price: melhor.preco, 
             found: true, 
-            player: melhorCandidato.atleta,
-            clubMismatch: melhorCandidato.clube_id !== expectedClubId
+            player: melhor.atleta,
+            clubMismatch: expectedClubId && melhor.clube_id !== expectedClubId
         };
     }
     
-    // ETAPA 4: Casos especiais (última tentativa)
-    console.log('\n--- ETAPA 4: Casos especiais ---');
+    // ETAPA 4: Casos especiais
     const specialCases = {
         'filipe luis': 'filipe luis',
         'lyanco': 'lyanco',
@@ -672,20 +639,16 @@ function getPlayerPrice(playerName, clubName) {
         });
         
         if (specialMatch) {
-            console.log(`✓ Match especial encontrado: ${specialMatch.apelido || specialMatch.nome} - Preço: ${specialMatch.preco_num}`);
+            console.log(`✓ Match especial: ${specialMatch.apelido || specialMatch.nome} - Preço: ${specialMatch.preco_num}`);
             return { price: specialMatch.preco_num || specialMatch.preco, found: true, player: specialMatch };
         }
     }
     
-    console.log(`✗✗✗ Jogador NÃO encontrado: ${playerName} (${clubName})`);
+    console.log(`✗ Jogador NÃO encontrado: ${playerName}`);
     return { price: null, found: false };
 }
-// ==================================================================================
-// ========================== FIM DA FUNÇÃO CORRIGIDA ===============================
-// ==================================================================================
 
-// Resto do código continua igual...
-// [Coloque aqui o restante das funções do arquivo original a partir da linha 593]
+
 
 // Função para gerar a arte
 function generateArt() {
@@ -745,114 +708,229 @@ function generateArt() {
     // Mostrar mensagens de erro se houver jogadores não encontrados
     showErrorMessages(notFoundPlayers);
     
-    console.log('=== JOGADORES POR POSIÇÃO ===');
-    console.log(playersByPosition);
-    
-    // Renderizar cada posição
-    Object.keys(playersByPosition).forEach(positionKey => {
-        const container = document.getElementById(positionKey);
-        if (!container) {
-            console.log(`Container não encontrado para posição: ${positionKey}`);
-            return;
+    // Renderizar jogadores em cada posição
+    console.log('Jogadores agrupados por posição:', playersByPosition);
+    Object.entries(playersByPosition).forEach(([positionId, players]) => {
+        console.log(`Renderizando posição: ${positionId} com ${players.length} jogadores`);
+        const container = document.getElementById(positionId);
+        if (container) {
+            // Log específico para técnicos antes da ordenação
+            if (positionId === 'tecnicos') {
+                console.log('=== TÉCNICOS ANTES DA ORDENAÇÃO ===');
+                players.forEach(player => {
+                    console.log(`${player.nome} - Confiança: ${player.confianca} - Unanimidade: ${player.unanimidade}`);
+                });
+            }
+            
+            // Ordenar jogadores: primeiro unanimidade, depois por confiança (A, B, C)
+            const sortedPlayers = players.sort((a, b) => {
+                // Primeiro critério: unanimidade (unânimes primeiro)
+                if (a.unanimidade && !b.unanimidade) return -1;
+                if (!a.unanimidade && b.unanimidade) return 1;
+                
+                // Segundo critério: confiança (A, B, C)
+                if (a.confianca !== b.confianca) {
+                    return a.confianca.localeCompare(b.confianca);
+                }
+                
+                // Terceiro critério: nome (ordem alfabética)
+                return a.nome.localeCompare(b.nome);
+            });
+            
+            // Log específico para técnicos depois da ordenação
+            if (positionId === 'tecnicos') {
+                console.log('=== TÉCNICOS DEPOIS DA ORDENAÇÃO ===');
+                sortedPlayers.forEach(player => {
+                    console.log(`${player.nome} - Confiança: ${player.confianca} - Unanimidade: ${player.unanimidade}`);
+                });
+            }
+            
+            sortedPlayers.forEach(player => {
+                console.log(`Criando elemento para: ${player.nome}`);
+                const playerElement = createPlayerElement(player);
+                container.appendChild(playerElement);
+            });
         }
-        
-        console.log(`Renderizando ${playersByPosition[positionKey].length} jogadores na posição ${positionKey}`);
-        
-        // Criar container para a lista de jogadores
-        const playersList = document.createElement('div');
-        playersList.className = 'players-list';
-        
-        // Adicionar cada jogador
-        playersByPosition[positionKey].forEach(player => {
-            const playerRow = createPlayerRow(player);
-            playersList.appendChild(playerRow);
-        });
-        
-        container.appendChild(playersList);
     });
     
-    console.log('=== ARTE GERADA COM SUCESSO ===');
+    // Aplicar layout dinâmico baseado na quantidade de jogadores
+    applyDynamicLayout(playersByPosition);
+    
+    // Mostrar botões de download
+    const exportButtons = document.querySelector('.export-buttons');
+    if (exportButtons) {
+        exportButtons.style.display = 'flex';
+    }
 }
 
-// Função para criar linha de jogador
-function createPlayerRow(player) {
+// Função para aplicar layout dinâmico baseado na quantidade de jogadores
+function applyDynamicLayout(playersByPosition) {
+    // Contar jogadores por linha do grid
+    const row1Count = (playersByPosition.tecnicos?.length || 0) + (playersByPosition.goleiros?.length || 0);
+    const row2Count = (playersByPosition.laterais?.length || 0) + (playersByPosition.zagueiros?.length || 0);
+    const row3Count = (playersByPosition.meias?.length || 0) + (playersByPosition.atacantes?.length || 0);
+    
+    // Calcular proporções baseadas na quantidade de jogadores
+    // Pesos ajustados para dar mais espaço aos meias e atacantes
+    const baseWeight1 = 0.2; // Técnicos/Goleiros - peso menor
+    const baseWeight2 = 0.25;  // Laterais/Zagueiros - peso médio
+    const baseWeight3 = 0.55;  // Meias/Atacantes - peso maior para evitar corte
+    const playerWeight = 0.1; // Peso adicional aumentado por jogador
+    
+    const row1Weight = Math.max(baseWeight1, baseWeight1 + (row1Count * playerWeight));
+    const row2Weight = Math.max(baseWeight2, baseWeight2 + (row2Count * playerWeight));
+    const row3Weight = Math.max(baseWeight3, baseWeight3 + (row3Count * playerWeight * 1.5)); // Peso extra para linha 3
+    
+    // Normalizar os pesos para que a soma seja proporcional
+    const totalWeight = row1Weight + row2Weight + row3Weight;
+    const normalizedRow1 = (row1Weight / totalWeight * 3).toFixed(2);
+    const normalizedRow2 = (row2Weight / totalWeight * 3).toFixed(2);
+    const normalizedRow3 = (row3Weight / totalWeight * 3).toFixed(2);
+    
+    // Aplicar as novas proporções ao grid
+    const positionsGrid = document.querySelector('.positions-grid');
+    if (positionsGrid) {
+        const newGridRows = `${normalizedRow1}fr ${normalizedRow2}fr ${normalizedRow3}fr`;
+        positionsGrid.style.gridTemplateRows = newGridRows;
+        
+        console.log(`Layout dinâmico aplicado:`);
+        console.log(`Linha 1 (Técnicos/Goleiros): ${row1Count} jogadores - ${normalizedRow1}fr`);
+        console.log(`Linha 2 (Laterais/Zagueiros): ${row2Count} jogadores - ${normalizedRow2}fr`);
+        console.log(`Linha 3 (Meias/Atacantes): ${row3Count} jogadores - ${normalizedRow3}fr`);
+        console.log(`Grid template rows: ${newGridRows}`);
+    }
+}
+
+// Função para criar elemento do jogador
+function createPlayerElement(player) {
     const playerRow = document.createElement('div');
     playerRow.className = 'player-row';
     
-    // Buscar dados de preço novamente para ter os dados completos
     const priceData = getPlayerPrice(player.nome, player.clube);
     
-    // Info do jogador (escudo + nome + ícones)
+    // Adicionar classe de erro se jogador não foi encontrado
+    if (!priceData.found) {
+        playerRow.classList.add('player-not-found');
+    }
+    
     const playerInfo = document.createElement('div');
     playerInfo.className = 'player-info';
-    
-    // Escudo do time em container branco
-    const teamBadgeWrapper = document.createElement('div');
-    teamBadgeWrapper.className = 'team-badge-wrapper';
-    
-    const teamBadge = document.createElement('img');
-    const normalizedClub = normalizeClubName(player.clube);
-    teamBadge.src = `https://s3-sa-east-1.amazonaws.com/static.footstats.com.br/img/badges/custom/${normalizedClub}.png`;
-    teamBadge.alt = player.clube;
-    teamBadge.className = 'team-badge';
-    teamBadge.onerror = function() {
-        console.log(`Escudo não encontrado para ${player.clube}, tentando fallback`);
-        this.src = 'https://via.placeholder.com/80x80?text=?';
-    };
-    teamBadgeWrapper.appendChild(teamBadge);
     
     // Nome do jogador
     const playerName = document.createElement('span');
     playerName.className = 'player-name';
-    playerName.textContent = player.nome;
+    playerName.textContent = player.nome.toUpperCase();
     
-    // Container de ícones
+    // Escudo do time com div de fundo branco
+    const teamBadgeWrapper = document.createElement('div');
+    teamBadgeWrapper.className = 'team-badge-wrapper';
+    
+    // Criar SVG com círculo branco (sempre renderizado pelo html2canvas)
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', '85');
+    svg.setAttribute('height', '85');
+    svg.setAttribute('viewBox', '0 0 85 85');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.zIndex = '0';
+    
+    const circle = document.createElementNS(svgNS, 'circle');
+    circle.setAttribute('cx', '42.5');
+    circle.setAttribute('cy', '42.5');
+    circle.setAttribute('r', '42.5');
+    circle.setAttribute('fill', '#ffffff');
+    
+    svg.appendChild(circle);
+    teamBadgeWrapper.appendChild(svg);
+    
+    const teamBadge = document.createElement('img');
+    teamBadge.className = 'team-badge-img';
+    const clubFileName = normalizeClubName(player.clube);
+    
+    // Log específico para Lyanco
+    if (player.nome.toLowerCase().includes('lyanco')) {
+        console.log('=== DEBUG LYANCO ESCUDO ===');
+        console.log('Clube original:', player.clube);
+        console.log('Clube normalizado:', clubFileName);
+        console.log('URL do escudo:', `public/escudos/${clubFileName}.png`);
+    }
+    
+    teamBadge.src = `public/escudos/${clubFileName}.png`;
+    teamBadge.alt = player.clube;
+    teamBadge.onerror = function() {
+        console.log('Erro ao carregar escudo:', this.src);
+        this.style.display = 'none';
+    };
+    
+    teamBadgeWrapper.appendChild(teamBadge);
+    
+    // Criar container de ícones
     const playerIcons = document.createElement('div');
     playerIcons.className = 'player-icons';
     
-    // Ícone de capitão
-    if (player.capitao) {
-        const capIcon = document.createElement('img');
-        capIcon.src = 'https://s3-sa-east-1.amazonaws.com/static.footstats.com.br/img/badges/custom/cap.png';
-        capIcon.alt = 'Capitão';
-        capIcon.className = 'icon-cap';
-        playerIcons.appendChild(capIcon);
-    }
+    console.log(`=== JOGADOR ${player.nome} ===`);
+    console.log(`Luxo: ${player.luxo}, Unanimidade: ${player.unanimidade}, Capitão: ${player.capitao}`);
+    console.log(`Container playerIcons criado:`, playerIcons);
     
-    // Ícone de unanimidade
-    if (player.unanimidade) {
-        const uniIcon = document.createElement('img');
-        uniIcon.src = 'https://s3-sa-east-1.amazonaws.com/static.footstats.com.br/img/badges/custom/uni.png';
-        uniIcon.alt = 'Unanimidade';
-        uniIcon.className = 'icon-uni';
-        playerIcons.appendChild(uniIcon);
-    }
-    
-    // Ícone de reserva de luxo
     if (player.luxo) {
         const luxoIcon = document.createElement('img');
-        luxoIcon.src = 'https://s3-sa-east-1.amazonaws.com/static.footstats.com.br/img/badges/custom/rl.png';
-        luxoIcon.alt = 'Reserva de Luxo';
-        luxoIcon.className = 'icon-rl';
+        luxoIcon.src = 'public/icons/luxo.svg';
+        luxoIcon.className = 'icon';
+        luxoIcon.alt = 'RL';
+        luxoIcon.onerror = function() { console.error('Erro ao carregar ícone de luxo'); };
+        luxoIcon.onload = function() { console.log('Ícone de luxo carregado com sucesso'); };
         playerIcons.appendChild(luxoIcon);
+        console.log('Ícone de luxo adicionado');
     }
     
-    // Nível de confiança (C)
+    if (player.unanimidade) {
+        const uniIcon = document.createElement('img');
+        uniIcon.src = 'public/icons/estrela.svg';
+        uniIcon.className = 'icon';
+        uniIcon.alt = 'Unanimidade';
+        uniIcon.onerror = function() { console.error('Erro ao carregar ícone de unanimidade'); };
+        uniIcon.onload = function() { console.log('Ícone de unanimidade carregado com sucesso'); };
+        playerIcons.appendChild(uniIcon);
+        console.log('Ícone de unanimidade adicionado');
+    }
+    
+    if (player.capitao) {
+        const capIcon = document.createElement('img');
+        capIcon.src = 'public/icons/capitao.svg';
+        capIcon.className = 'icon';
+        capIcon.alt = 'Capitão';
+        capIcon.onerror = function() { console.error('Erro ao carregar ícone de capitão'); };
+        capIcon.onload = function() { console.log('Ícone de capitão carregado com sucesso'); };
+        playerIcons.appendChild(capIcon);
+        console.log('Ícone de capitão adicionado');
+    }
+    
+
+    
+    console.log(`Total de ícones no container: ${playerIcons.children.length}`);
+    console.log(`PlayerIcons HTML:`, playerIcons.outerHTML);
+    console.log(`PlayerIcons será inserido em playerInfo:`, playerInfo);
+    
+    // Nível de confiança
     const confidenceLevel = document.createElement('div');
-    confidenceLevel.className = `confidence-level conf-${player.confianca.toLowerCase()}`;
+    confidenceLevel.className = `confidence-level confidence-${player.confianca}`;
     confidenceLevel.textContent = player.confianca;
     
-    // Preço (C$)
-    const playerPrice = document.createElement('div');
+    // Preço
+    const playerPrice = document.createElement('span');
     playerPrice.className = 'player-price';
-    if (priceData.found && priceData.price) {
-        playerPrice.textContent = priceData.price.toFixed(1);
+    if (!priceData.found) {
+        playerPrice.classList.add('price-error');
+        playerPrice.textContent = 'N/E';
     } else {
-        playerPrice.textContent = '-';
+        const price = priceData.price || 0;
+        playerPrice.textContent = price.toFixed(1);
     }
     
-    // MPV
-    const playerMPV = document.createElement('div');
+    // Mínimo Para Valorizar (MPV)
+    const playerMPV = document.createElement('span');
     playerMPV.className = 'player-mpv';
     if (priceData.found && priceData.player && priceData.player.atleta_id) {
         const mpv = getPlayerMPV(priceData.player.atleta_id);
