@@ -588,8 +588,18 @@ function getPlayerPrice(playerName, clubName, posicao) {
     atletasArray.forEach(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
         
+        // Dividir o nome do jogador em palavras
+        const palavrasEsperadas = normalizedPlayerName.split(' ').filter(p => p.length > 0);
+        const palavrasAtleta = atletaNome.split(' ').filter(p => p.length > 0);
+        
+        // Verificar se TODAS as palavras do nome esperado estão no nome do atleta
+        const todasPalavrasPresentes = palavrasEsperadas.every(palavra => 
+            palavrasAtleta.some(p => p.includes(palavra) || palavra.includes(p))
+        );
+        
         // Verificar se há alguma similaridade no nome
-        const nomeMatch = atletaNome.includes(normalizedPlayerName) || 
+        const nomeMatch = todasPalavrasPresentes || 
+                          atletaNome.includes(normalizedPlayerName) || 
                           normalizedPlayerName.includes(atletaNome);
         
         if (nomeMatch) {
@@ -600,6 +610,9 @@ function getPlayerPrice(playerName, clubName, posicao) {
             if (atletaNome === normalizedPlayerName) {
                 score += 100;
                 detalhes.push('nome=100');
+            } else if (todasPalavrasPresentes) {
+                score += 90;  // Quase perfeito: todas as palavras presentes
+                detalhes.push('nome=90');
             } else if (atletaNome.includes(normalizedPlayerName)) {
                 score += 50;
                 detalhes.push('nome=50');
