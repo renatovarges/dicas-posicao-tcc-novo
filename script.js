@@ -526,16 +526,16 @@ function getPlayerPrice(playerName, clubName, posicao) {
         'gremio': 284,
         'internacional': 285,
         'bahia': 265,
-        'vitoria': 373,
-        'vitória': 373,
+        'vitoria': 287,
+        'vitória': 287,
         'red bull bragantino': 280,
         'bragantino': 280,
-        'mirassol': 368,
+        'mirassol': 2305,
         'athletico-pr': 293,
         'athletico pr': 293,
         'coritiba': 294,
-        'chapecoense': 292,
-        'remo': 356
+        'chapecoense': 315,
+        'remo': 364
     };
     
     // Mapeamento de IDs das posições
