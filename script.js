@@ -408,7 +408,7 @@ function parsePlayerData(content) {
             }
             
             // Buscar preço na API do Cartola
-            player.preco = getPlayerPrice(player.nome, player.clube);
+            player.preco = getPlayerPrice(player.nome, player.clube, player.posicao);
             playerData.push(player);
         }
     }
@@ -495,10 +495,14 @@ function normalizeClubName(clubName) {
     return normalized.replace(/\s+/g, ' ');
 }
 
-// Função para buscar preço do jogador - CORRIGIDA
-function getPlayerPrice(playerName, clubName) {
+// ========================================
+// FUNÇÃO BLINDADA - getPlayerPrice
+// Busca por: POSIÇÃO + NOME + CLUBE
+// ========================================
+
+function getPlayerPrice(playerName, clubName, posicao) {
     if (!cartolaData || !cartolaData.atletas) {
-        console.log('Dados do Cartola não disponíveis para:', playerName);
+        console.log('❌ Dados do Cartola não disponíveis para:', playerName);
         return { price: null, found: false };
     }
     
@@ -534,73 +538,104 @@ function getPlayerPrice(playerName, clubName) {
         'remo': 356
     };
     
-    const expectedClubId = CLUB_ID_MAP[normalizedClubName];
+    // Mapeamento de IDs das posições
+    const POSITION_ID_MAP = {
+        'GOL': 1,  // Goleiro
+        'LAT': 2,  // Lateral
+        'ZAG': 3,  // Zagueiro
+        'MEI': 4,  // Meia
+        'ATA': 5,  // Atacante
+        'TEC': 6   // Técnico
+    };
     
-    console.log(`Buscando: ${playerName} do ${clubName} (clube_id: ${expectedClubId})`);
+    const expectedClubId = CLUB_ID_MAP[normalizedClubName];
+    const expectedPosicaoId = POSITION_ID_MAP[posicao.toUpperCase()];
+    
+    console.log(`\n[BUSCA BLINDADA] ${posicao} | ${playerName} | ${clubName}`);
+    console.log(`   → Posição ID: ${expectedPosicaoId} | Clube ID: ${expectedClubId}`);
     
     const atletasArray = Object.values(cartolaData.atletas);
     
-    // ETAPA 1: Busca exata (nome + clube)
+    // ========================================
+    // ETAPA 1: BUSCA EXATA (posição + nome + clube)
+    // ========================================
     const exactMatch = atletasArray.find(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
         const nomeMatch = atletaNome === normalizedPlayerName;
-        const clubeMatch = atleta.clube_id === expectedClubId;
+        const clubeMatch = expectedClubId && atleta.clube_id === expectedClubId;
+        const posicaoMatch = expectedPosicaoId && atleta.posicao_id === expectedPosicaoId;
         
-        if (nomeMatch && clubeMatch) {
-            console.log(`✓ MATCH EXATO: ${atleta.apelido || atleta.nome} - Preço: ${atleta.preco_num}`);
+        if (nomeMatch && clubeMatch && posicaoMatch) {
+            console.log(`✅ MATCH EXATO: ${atleta.apelido || atleta.nome} (${atleta.posicao_id}/${atleta.clube_id}) - C$ ${atleta.preco_num}`);
             return true;
         }
         return false;
     });
     
     if (exactMatch) {
-        return { price: exactMatch.preco_num || exactMatch.preco, found: true, player: exactMatch };
+        return { 
+            price: exactMatch.preco_num || exactMatch.preco, 
+            found: true, 
+            player: exactMatch 
+        };
     }
     
-    // ETAPA 2: Busca por nome exato (sem verificar clube)
-    const exactNameMatch = atletasArray.find(atleta => {
-        const atletaNome = normalizeString(atleta.apelido || atleta.nome);
-        const match = atletaNome === normalizedPlayerName;
-        
-        if (match) {
-            console.log(`✓ Nome exato: ${atleta.apelido || atleta.nome} - Preço: ${atleta.preco_num}`);
-            if (atleta.clube_id !== expectedClubId) {
-                console.warn(`⚠ Clube diferente! Esperado: ${expectedClubId}, Encontrado: ${atleta.clube_id}`);
-            }
-        }
-        return match;
-    });
-    
-    if (exactNameMatch) {
-        return { price: exactNameMatch.preco_num || exactNameMatch.preco, found: true, player: exactNameMatch };
-    }
-    
-    // ETAPA 3: Busca similar COM pontuação e verificação de clube (A CORREÇÃO PRINCIPAL!)
+    // ========================================
+    // ETAPA 2: BUSCA SIMILAR COM PRIORIDADE TRIPLA
+    // ========================================
     const candidatos = [];
     
     atletasArray.forEach(atleta => {
         const atletaNome = normalizeString(atleta.apelido || atleta.nome);
-        const nomeMatch = atletaNome.includes(normalizedPlayerName) || normalizedPlayerName.includes(atletaNome);
+        
+        // Verificar se há alguma similaridade no nome
+        const nomeMatch = atletaNome.includes(normalizedPlayerName) || 
+                          normalizedPlayerName.includes(atletaNome);
         
         if (nomeMatch) {
             let score = 0;
+            let detalhes = [];
             
-            // Pontos por qualidade do match
-            if (atletaNome === normalizedPlayerName) score += 100;
-            else if (atletaNome.includes(normalizedPlayerName)) score += 50;
-            else if (normalizedPlayerName.includes(atletaNome)) score += 40;
-            else score += 20;
-            
-            // PONTOS CRUCIAIS: mesmo clube (+1000 pontos)
-            if (expectedClubId && atleta.clube_id === expectedClubId) {
-                score += 1000;
+            // Pontos por qualidade do match de nome
+            if (atletaNome === normalizedPlayerName) {
+                score += 100;
+                detalhes.push('nome=100');
+            } else if (atletaNome.includes(normalizedPlayerName)) {
+                score += 50;
+                detalhes.push('nome=50');
+            } else if (normalizedPlayerName.includes(atletaNome)) {
+                score += 40;
+                detalhes.push('nome=40');
+            } else {
+                score += 20;
+                detalhes.push('nome=20');
             }
+            
+            // ⭐ POSIÇÃO CORRETA: +100000 pontos (prioridade máxima)
+            if (expectedPosicaoId && atleta.posicao_id === expectedPosicaoId) {
+                score += 100000;
+                detalhes.push('posição=100000');
+            } else {
+                detalhes.push('posição=0');
+            }
+            
+            // ⭐ CLUBE CORRETO: +10000 pontos
+            if (expectedClubId && atleta.clube_id === expectedClubId) {
+                score += 10000;
+                detalhes.push('clube=10000');
+            } else {
+                detalhes.push('clube=0');
+            }
+            
+            const status = (atleta.posicao_id === expectedPosicaoId && atleta.clube_id === expectedClubId) ? '✅' : '⚠️';
+            console.log(`   ${status} ${atleta.apelido || atleta.nome} (pos:${atleta.posicao_id}/clube:${atleta.clube_id}) - Score: ${score} [${detalhes.join(', ')}]`);
             
             candidatos.push({
                 atleta: atleta,
                 score: score,
                 nome: atleta.apelido || atleta.nome,
                 clube_id: atleta.clube_id,
+                posicao_id: atleta.posicao_id,
                 preco: atleta.preco_num || atleta.preco
             });
         }
@@ -611,40 +646,47 @@ function getPlayerPrice(playerName, clubName) {
         candidatos.sort((a, b) => b.score - a.score);
         const melhor = candidatos[0];
         
-        console.log(`✓ Match similar: ${melhor.nome} (score: ${melhor.score}) - Preço: ${melhor.preco}`);
+        console.log(`✅ MELHOR MATCH: ${melhor.nome} (pos:${melhor.posicao_id}/clube:${melhor.clube_id}, score:${melhor.score}) - C$ ${melhor.preco}`);
         
+        // Avisar se posição ou clube não batem
+        if (expectedPosicaoId && melhor.posicao_id !== expectedPosicaoId) {
+            console.error(`❌ ERRO CRÍTICO: Posição diferente! Esperado: ${expectedPosicaoId}, Encontrado: ${melhor.posicao_id}`);
+        }
         if (expectedClubId && melhor.clube_id !== expectedClubId) {
-            console.warn(`⚠ Clube diferente no melhor match!`);
+            console.error(`❌ ERRO CRÍTICO: Clube diferente! Esperado: ${expectedClubId}, Encontrado: ${melhor.clube_id}`);
         }
         
         return { 
             price: melhor.preco, 
             found: true, 
             player: melhor.atleta,
+            positionMismatch: expectedPosicaoId && melhor.posicao_id !== expectedPosicaoId,
             clubMismatch: expectedClubId && melhor.clube_id !== expectedClubId
         };
     }
     
-    // ETAPA 4: Casos especiais
-    const specialCases = {
-        'filipe luis': 'filipe luis',
-        'lyanco': 'lyanco',
-        'vojvoda': 'vojvoda'
-    };
+    // ========================================
+    // ETAPA 3: BUSCA SEM CLUBE (último recurso)
+    // ========================================
+    console.warn(`⚠️ Buscando ${playerName} apenas por POSIÇÃO + NOME (sem clube)`);
     
-    if (specialCases[normalizedPlayerName]) {
-        const specialMatch = atletasArray.find(atleta => {
-            const atletaNome = normalizeString(atleta.apelido || atleta.nome);
-            return atletaNome.includes(specialCases[normalizedPlayerName]);
-        });
-        
-        if (specialMatch) {
-            console.log(`✓ Match especial: ${specialMatch.apelido || specialMatch.nome} - Preço: ${specialMatch.preco_num}`);
-            return { price: specialMatch.preco_num || specialMatch.preco, found: true, player: specialMatch };
-        }
+    const positionMatch = atletasArray.find(atleta => {
+        const atletaNome = normalizeString(atleta.apelido || atleta.nome);
+        const nomeMatch = atletaNome === normalizedPlayerName;
+        const posicaoMatch = expectedPosicaoId && atleta.posicao_id === expectedPosicaoId;
+        return nomeMatch && posicaoMatch;
+    });
+    
+    if (positionMatch) {
+        console.log(`⚠️ Match por posição+nome: ${positionMatch.apelido || positionMatch.nome} (pos:${positionMatch.posicao_id}/clube:${positionMatch.clube_id}) - C$ ${positionMatch.preco_num}`);
+        return { 
+            price: positionMatch.preco_num || positionMatch.preco, 
+            found: true, 
+            player: positionMatch 
+        };
     }
     
-    console.log(`✗ Jogador NÃO encontrado: ${playerName}`);
+    console.error(`❌ Jogador NÃO encontrado: ${posicao} ${playerName} (${clubName})`);
     return { price: null, found: false };
 }
 
