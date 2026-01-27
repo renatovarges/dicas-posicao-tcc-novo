@@ -496,6 +496,42 @@ function normalizeClubName(clubName) {
 }
 
 // ========================================
+// FUNÇÃO DE SIMILARIDADE (Levenshtein Distance)
+// Calcula quantas letras são diferentes entre dois nomes
+// ========================================
+
+function calcularSimilaridade(str1, str2) {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix = [];
+    
+    // Inicializar matriz
+    for (let i = 0; i <= len1; i++) {
+        matrix[i] = [i];
+    }
+    for (let j = 0; j <= len2; j++) {
+        matrix[0][j] = j;
+    }
+    
+    // Calcular distância
+    for (let i = 1; i <= len1; i++) {
+        for (let j = 1; j <= len2; j++) {
+            if (str1[i - 1] === str2[j - 1]) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1,  // substituição
+                    matrix[i][j - 1] + 1,      // inserção
+                    matrix[i - 1][j] + 1       // remoção
+                );
+            }
+        }
+    }
+    
+    return matrix[len1][len2];
+}
+
+// ========================================
 // FUNÇÃO BLINDADA - getPlayerPrice
 // Busca por: POSIÇÃO + NOME + CLUBE
 // ========================================
@@ -593,8 +629,13 @@ function getPlayerPrice(playerName, clubName, posicao) {
         const palavrasAtleta = atletaNome.split(' ').filter(p => p.length > 0);
         
         // Verificar se TODAS as palavras do nome esperado estão no nome do atleta
+        // Agora com tolerância a pequenas diferenças (William vs Willian)
         const todasPalavrasPresentes = palavrasEsperadas.every(palavra => 
-            palavrasAtleta.some(p => p.includes(palavra) || palavra.includes(p))
+            palavrasAtleta.some(p => {
+                const distancia = calcularSimilaridade(p, palavra);
+                // Aceita se a distância for menor ou igual a 2 letras diferentes
+                return p.includes(palavra) || palavra.includes(p) || distancia <= 2;
+            })
         );
         
         // Verificar se há alguma similaridade no nome
