@@ -549,7 +549,7 @@ function getPlayerPrice(playerName, clubName, posicao) {
     };
     
     const expectedClubId = CLUB_ID_MAP[normalizedClubName];
-    const expectedPosicaoId = POSITION_ID_MAP[posicao.toUpperCase()];
+    const expectedPosicaoId = posicao ? POSITION_ID_MAP[posicao.toUpperCase()] : null;
     
     console.log(`\n[BUSCA BLINDADA] ${posicao} | ${playerName} | ${clubName}`);
     console.log(`   → Posição ID: ${expectedPosicaoId} | Clube ID: ${expectedClubId}`);
